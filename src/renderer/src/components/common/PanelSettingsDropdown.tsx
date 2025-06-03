@@ -1,20 +1,23 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import { IconMenu2 } from '@tabler/icons-react'
+import { IconCrown, IconMenu2 } from '@tabler/icons-react'
 import Button from './Button'
-import tw from 'twin.macro'
+import tw, { TwStyle } from 'twin.macro'
 import { useAtom } from 'jotai'
 import { useState } from 'react'
 import ModalPortal from '@renderer/utils/ModalPortal'
 import PanelStylesModal from './PanelStylesModal'
 import { readWritePanelGridAtom } from '@renderer/store'
 import { mergePanels, unmergePanel } from '@renderer/utils/panelUtils'
+import { PANEL_ROWS } from '@shared/constants'
 
 type PanelSettingsDropdownProps = {
   panelId: string
+  sx?: TwStyle
 }
 
 export default function PanelSettingsDropdown({
-  panelId
+  panelId,
+  sx
 }: PanelSettingsDropdownProps): JSX.Element {
   const [panelGrid, setPanelGrid] = useAtom(readWritePanelGridAtom)
   const panel = panelGrid.panels.find((p) => p.id === panelId)
@@ -37,7 +40,7 @@ export default function PanelSettingsDropdown({
     if (!basePanel) return
 
     const mergeTarget = panelGrid.panels.filter((p) => p.col === basePanel.col)
-    if (mergeTarget.length < 2) return
+    if (mergeTarget.length < PANEL_ROWS) return
 
     const rows = mergeTarget.map((p) => p.row)
     const cols = mergeTarget.map((p) => p.col)
@@ -64,8 +67,8 @@ export default function PanelSettingsDropdown({
     <>
       <DropdownMenu.Root>
         <DropdownMenu.Trigger asChild>
-          <Button type="button" variant="ghost" size="icon" sx={tw`shrink-0`}>
-            <IconMenu2 size={14} />
+          <Button type="button" variant="ghost" size="icon" css={[sx]}>
+            {settings.isBase ? <IconCrown size={14} /> : <IconMenu2 size={14} />}
           </Button>
         </DropdownMenu.Trigger>
 

@@ -6,7 +6,7 @@ export default function MainPage(): JSX.Element {
     <div className="overflow-hidden">
       <MainPageNavigationBar />
 
-      <div className="flex h-[calc(100vh-60px)]">
+      <div className="flex h-[calc(100vh-80px)]">
         <PanelGrid />
       </div>
     </div>

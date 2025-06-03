@@ -89,7 +89,7 @@ export default function BibleVerseViewer(): JSX.Element {
     <div className="flex w-full">
       <div
         ref={keywordMatchedVersesScrollRef}
-        className="flex-1 p-16pxr overflow-y-auto bg-emerald-100"
+        className="flex-1 p-16pxr overflow-y-auto bg-indigo-100"
       >
         {searchCondition && (
           <div className="flex flex-col mb-16pxr">
@@ -114,7 +114,7 @@ export default function BibleVerseViewer(): JSX.Element {
           </div>
         )}
         {renderVerseList()}
-        <div className="sticky -bottom-16pxr flex justify-center -mx-16pxr -mb-16pxr py-8pxr bg-emerald-100">
+        <div className="sticky -bottom-16pxr flex justify-center -mx-16pxr -mb-16pxr py-8pxr bg-indigo-100">
           <Pagination
             totalPages={totalPages}
             currentPage={currentPage}
@@ -124,7 +124,7 @@ export default function BibleVerseViewer(): JSX.Element {
       </div>
       <div
         ref={fullChaptersWithKeywordScrollRef}
-        className="flex-1 p-16pxr overflow-y-auto bg-amber-100"
+        className="flex-1 p-16pxr overflow-y-auto bg-rose-100"
       >
         {bibleData
           ? bibleData.map(({ book, chapter, verse, btext }) => (

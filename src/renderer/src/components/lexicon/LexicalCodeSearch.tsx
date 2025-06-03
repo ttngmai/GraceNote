@@ -3,33 +3,34 @@ import {
   readWriteLexicalCodeSearchAtom
 } from '@renderer/store'
 import { useAtom, useSetAtom } from 'jotai'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Button from '../common/Button'
 import { IconSearch } from '@tabler/icons-react'
 import CustomSelect from '../common/CustomSelect'
 import { PANEL_CATEGORIES_AND_VERSIONS } from '@shared/constants'
-import { PanelCategory } from '@shared/types'
+import { LexicalCodeSearchCondition, PanelCategory } from '@shared/types'
 import BibleRangeSelector from '../bible/BibleRangeSelector'
 
 const FIXED_INPUT_COUNT = 3
 
 export default function LexicalCodeSearch(): JSX.Element {
+  const firstInputRef = useRef<HTMLInputElement>(null)
+
   const [searchCondition, setSearchCondition] = useAtom(readWriteLexicalCodeSearchAtom)
   const setLexicalCodeSearchResult = useSetAtom(readWriteLexicalCodeSearchResultAtom)
   const { codes } = searchCondition
 
-  const [tempSearchCondition, setTempSearchCondition] = useState(searchCondition)
-  const { codes: tempCodes } = tempSearchCondition
+  const [tempSearchCondition, setTempSearchCondition] = useState({ ...searchCondition })
 
   const handleCodeChange = (index: number, value: string): void => {
-    const updatedCodes = [...tempCodes]
+    const updatedCodes = [...tempSearchCondition.codes]
     updatedCodes[index] = value.trim().toUpperCase()
     setTempSearchCondition({ ...tempSearchCondition, codes: updatedCodes })
   }
 
-  const handleSearchLexicalCode = async (): Promise<void> => {
-    setSearchCondition(tempSearchCondition)
-    const result = await window.context.findLexicalCodeFromBible(tempSearchCondition)
+  const handleSearchLexicalCode = async (condition: LexicalCodeSearchCondition): Promise<void> => {
+    setSearchCondition(condition)
+    const result = await window.context.findLexicalCodeFromBible(condition)
     if (result) {
       setLexicalCodeSearchResult(result)
     }
@@ -37,12 +38,28 @@ export default function LexicalCodeSearch(): JSX.Element {
 
   const handleEnterKey = (e: React.KeyboardEvent<HTMLInputElement>): void => {
     if (e.key === 'Enter') {
-      handleSearchLexicalCode()
+      handleSearchLexicalCode(tempSearchCondition)
     }
   }
 
   useEffect(() => {
-    handleSearchLexicalCode()
+    window.context.onUpdateLexicalCode((keyword: string) => {
+      setTempSearchCondition((prev) => {
+        const condition = {
+          ...prev,
+          codes: keyword ? [keyword] : prev.codes
+        }
+
+        handleSearchLexicalCode(condition)
+
+        setTimeout(() => {
+          firstInputRef.current?.focus()
+          firstInputRef.current?.select()
+        }, 0)
+
+        return condition
+      })
+    })
   }, [])
 
   useEffect(() => {
@@ -51,7 +68,10 @@ export default function LexicalCodeSearch(): JSX.Element {
       while (newCodes.length < FIXED_INPUT_COUNT) {
         newCodes.push('')
       }
-      setTempSearchCondition({ ...searchCondition, codes: newCodes.slice(0, FIXED_INPUT_COUNT) })
+      setTempSearchCondition({
+        ...tempSearchCondition,
+        codes: newCodes.slice(0, FIXED_INPUT_COUNT)
+      })
     }
   }, [codes, setTempSearchCondition])
 
@@ -72,6 +92,10 @@ export default function LexicalCodeSearch(): JSX.Element {
           />
           <BibleRangeSelector
             placeholder="검색 범위 선택"
+            initialValue={{
+              start: tempSearchCondition.bookRange[0],
+              end: tempSearchCondition.bookRange[1]
+            }}
             onSelect={(start, end) => {
               setTempSearchCondition({ ...tempSearchCondition, bookRange: [start, end] })
             }}
@@ -82,15 +106,20 @@ export default function LexicalCodeSearch(): JSX.Element {
           {[0, 1, 2].map((index) => (
             <input
               key={index}
+              ref={index === 0 ? firstInputRef : undefined}
               type="text"
-              value={tempCodes[index] || ''}
+              value={tempSearchCondition.codes[index] || ''}
               onChange={(e) => handleCodeChange(index, e.target.value)}
               onKeyDown={handleEnterKey}
               id={`lexical-code-${index}`}
               className="inline-flex justify-center items-center w-80pxr h-32pxr p-4pxr border border-gray-300 rounded-md text-center"
             ></input>
           ))}
-          <Button type="button" onClick={handleSearchLexicalCode} size="icon">
+          <Button
+            type="button"
+            onClick={() => handleSearchLexicalCode(tempSearchCondition)}
+            size="icon"
+          >
             <IconSearch size={18} />
           </Button>
         </div>

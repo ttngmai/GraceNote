@@ -2,14 +2,14 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { IconChevronRight } from '@tabler/icons-react'
 import { PanelCategory } from '@shared/types'
 import { TwStyle } from 'twin.macro'
-import { ReactNode } from 'react'
 import { useAtom } from 'jotai'
 import { PANEL_CATEGORIES_AND_VERSIONS } from '@shared/constants'
 import { readWritePanelGridAtom } from '@renderer/store'
+import { Textfit } from 'react-textfit'
 
 type PanelCategorySelectorProps = {
   panelId: string
-  placeholder?: string | ReactNode
+  placeholder?: string
   sx?: TwStyle
 }
 
@@ -38,7 +38,11 @@ export default function PanelCategorySelector({
 
   return (
     <DropdownMenu.Root>
-      <DropdownMenu.Trigger css={[sx]}>{placeholder || '없음'}</DropdownMenu.Trigger>
+      <DropdownMenu.Trigger css={[sx]}>
+        <Textfit mode="single" min={8} max={14}>
+          {placeholder || '없음'}
+        </Textfit>
+      </DropdownMenu.Trigger>
 
       <DropdownMenu.Portal>
         <DropdownMenu.Content

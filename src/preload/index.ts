@@ -46,7 +46,12 @@ try {
     getAudioFilePath: (fileName: string) => ipcRenderer.invoke('getAudioFilePath', fileName),
     getImageFilePath: (fileName: string) => ipcRenderer.invoke('getImageFilePath', fileName),
     openBibleVerseWindow: () => ipcRenderer.invoke('open-bible-verse-window'),
-    openLexiconWindow: () => ipcRenderer.invoke('open-lexicon-window'),
+    openLexiconWindow: (keyword?: string) => ipcRenderer.send('open-lexicon-window', keyword),
+    onUpdateLexicalCode: (callback) => {
+      ipcRenderer.on('update-lexical-code', (_event, keyword) => {
+        callback(keyword)
+      })
+    },
     openHymnWindow: () => ipcRenderer.invoke('open-hymn-window')
   })
 } catch (error) {

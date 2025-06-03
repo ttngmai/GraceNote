@@ -1,10 +1,5 @@
 import Button from '../common/Button'
-import {
-  IconAlphabetHebrew,
-  IconChevronLeft,
-  IconChevronRight,
-  IconSearch
-} from '@tabler/icons-react'
+import { IconChevronLeft, IconChevronRight, IconSearch } from '@tabler/icons-react'
 import { readWriteLexicalCodeAtom, readWriteLexicalCodeSearchAtom } from '@renderer/store'
 import { useAtom } from 'jotai'
 import { useEffect, useState } from 'react'
@@ -18,7 +13,7 @@ export default function SimpleLexicalCodeSearch(): JSX.Element {
 
   const openInLexiconPage = (keyword: string): void => {
     setSearchCondition({ ...searchCondition, codes: [keyword] })
-    window.context.openLexiconWindow()
+    window.context.openLexiconWindow(keyword)
   }
 
   const updateLexicalCode = (direction: 'prev' | 'next'): void => {
@@ -49,8 +44,9 @@ export default function SimpleLexicalCodeSearch(): JSX.Element {
 
   return (
     <div className="flex items-center shrink-0 w-fit gap-8pxr">
-      <Label.Root className="font-bold" htmlFor="lexical-code">
-        <IconAlphabetHebrew size={18} />
+      <Label.Root className="flex gap-4pxr font-bold" htmlFor="lexical-code">
+        <span style={{ fontFamily: 'Noto Serif Hebrew' }}>א</span>
+        <span style={{ fontFamily: 'Noto Serif' }}>Ω</span>
       </Label.Root>
       <input
         type="text"

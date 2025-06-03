@@ -247,9 +247,10 @@ ipcMain.handle('open-bible-verse-window', async () => {
   })
 })
 
-ipcMain.handle('open-lexicon-window', async () => {
+ipcMain.on('open-lexicon-window', (_, keyword) => {
   if (lexiconWindow) {
     lexiconWindow.focus()
+    lexiconWindow.webContents.send('update-lexical-code', keyword)
     return
   }
 
@@ -273,6 +274,12 @@ ipcMain.handle('open-lexicon-window', async () => {
       hash: '#/lexicon'
     })
   }
+
+  lexiconWindow.webContents.on('did-finish-load', () => {
+    if (lexiconWindow && !lexiconWindow.isDestroyed()) {
+      lexiconWindow.webContents.send('update-lexical-code', keyword)
+    }
+  })
 
   lexiconWindow.on('closed', () => {
     lexiconWindow = null

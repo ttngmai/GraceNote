@@ -1,8 +1,6 @@
 import { useAtom } from 'jotai'
 import { readWritePanelTextSizeAtom } from '@renderer/store'
-import { IconTextSize } from '@tabler/icons-react'
 import CustomSelect from './CustomSelect'
-import Button from './Button'
 
 export default function PanelTextSizeSelector(): JSX.Element {
   const [panelTextSize, setPanelTextSize] = useAtom(readWritePanelTextSizeAtom)
@@ -16,10 +14,6 @@ export default function PanelTextSizeSelector(): JSX.Element {
         text: `${el} pt`
       }))}
       setValue={(value) => setPanelTextSize(Number(value))}
-    >
-      <Button type="button" size="icon">
-        <IconTextSize size={18} />
-      </Button>
-    </CustomSelect>
+    />
   )
 }

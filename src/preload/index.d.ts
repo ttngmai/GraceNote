@@ -30,7 +30,8 @@ declare global {
       getAudioFilePath: (fileName: string) => string
       getImageFilePath: (fileName: string) => string
       openBibleVerseWindow: () => void
-      openLexiconWindow: () => void
+      openLexiconWindow: (keyword?: string) => void
+      onUpdateLexicalCode: (callback) => void
       openHymnWindow: () => void
     }
   }

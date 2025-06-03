@@ -6,15 +6,17 @@ import Button from '../common/Button'
 
 type BibleRangeSelectorProps = {
   placeholder?: string
+  initialValue?: { start: number; end: number }
   onSelect: (start: number, end: number) => void
 }
 
 export default function BibleRangeSelector({
   placeholder,
+  initialValue,
   onSelect
 }: BibleRangeSelectorProps): JSX.Element {
-  const [start, setStart] = useState<number | null>(null)
-  const [end, setEnd] = useState<number | null>(null)
+  const [start, setStart] = useState<number | null>(initialValue?.start || null)
+  const [end, setEnd] = useState<number | null>(initialValue?.end || null)
   const [openBookSelector, setOpenBookSelector] = useState(false)
 
   const handleSelect = (value: number): void => {
@@ -50,7 +52,11 @@ export default function BibleRangeSelector({
             setEnd(66)
           }}
           variant="outline"
-          sx={tw`w-40pxr rounded-r-none border-r-0`}
+          sx={
+            start === 1 && end === 66
+              ? tw`w-40pxr rounded-r-none border-r-0 font-bold text-brand-blue-500`
+              : tw`w-40pxr rounded-r-none border-r-0`
+          }
         >
           전체
         </Button>
@@ -61,7 +67,11 @@ export default function BibleRangeSelector({
             setEnd(39)
           }}
           variant="outline"
-          sx={tw`w-40pxr rounded-none`}
+          sx={
+            start === 1 && end === 39
+              ? tw`w-40pxr rounded-none font-bold text-brand-blue-500`
+              : tw`w-40pxr rounded-none`
+          }
         >
           구약
         </Button>
@@ -72,7 +82,11 @@ export default function BibleRangeSelector({
             setEnd(66)
           }}
           variant="outline"
-          sx={tw`w-40pxr rounded-l-none border-l-0`}
+          sx={
+            start === 40 && end === 66
+              ? tw`w-40pxr rounded-l-none border-l-0 font-bold text-brand-blue-500`
+              : tw`w-40pxr rounded-l-none border-l-0`
+          }
         >
           신약
         </Button>
@@ -88,9 +102,13 @@ export default function BibleRangeSelector({
             )
           ) : (
             <>
-              <span>{BOOK_INFO.find((el) => el.id === start)?.name}</span>
+              <span className="font-bold text-brand-blue-500">
+                {BOOK_INFO.find((el) => el.id === start)?.name}
+              </span>
               <span>~</span>
-              <span>{BOOK_INFO.find((el) => el.id === end)?.name}</span>
+              <span className="font-bold text-brand-blue-500">
+                {BOOK_INFO.find((el) => el.id === end)?.name}
+              </span>
             </>
           )}
         </Popover.Trigger>

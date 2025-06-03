@@ -70,6 +70,10 @@ export default function BibleVerseSearch(): JSX.Element {
           />
           <BibleRangeSelector
             placeholder="검색 범위 선택"
+            initialValue={{
+              start: tempSearchCondition.bookRange[0],
+              end: tempSearchCondition.bookRange[1]
+            }}
             onSelect={(start, end) => {
               setTempSearchCondition({ ...tempSearchCondition, bookRange: [start, end] })
             }}

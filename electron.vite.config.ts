@@ -1,6 +1,7 @@
 import { resolve } from 'path'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 import react from '@vitejs/plugin-react'
+import svgr from 'vite-plugin-svgr'
 
 export default defineConfig({
   main: {
@@ -34,6 +35,7 @@ export default defineConfig({
     resolve: {
       alias: {
         '@renderer': resolve('src/renderer/src'),
+        '@public': resolve('src/renderer/public'),
         '@shared': resolve('src/shared')
       }
     },
@@ -51,7 +53,8 @@ export default defineConfig({
         babel: {
           plugins: ['babel-plugin-macros', 'babel-plugin-styled-components']
         }
-      })
+      }),
+      svgr()
     ]
   }
 })

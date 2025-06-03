@@ -1,7 +1,7 @@
 import { PanelCategory, TPanelLayout, TPanelSettings } from '@shared/types'
 import PanelCategorySelector from './PanelCategorySelector'
 import Button from './Button'
-import { IconCrown, IconGripVertical } from '@tabler/icons-react'
+import { IconGripVertical } from '@tabler/icons-react'
 import tw, { css } from 'twin.macro'
 import BiblePanel from '../bible/BiblePanel'
 import CodedBiblePanel from '../bible/CodedBiblePanel'
@@ -14,26 +14,20 @@ import CommentaryPanel from '../commentary/CommentaryPanel'
 type PanelProps = {
   key?: string
   layout: TPanelLayout
-  settings: TPanelSettings
-  hiddenRows: Set<number>
-  hiddenCols: Set<number>
+  setting: TPanelSettings
 }
 
-const Panel: React.FC<PanelProps> = ({ layout, settings, hiddenRows, hiddenCols }: PanelProps) => {
+const Panel: React.FC<PanelProps> = ({ layout, setting }: PanelProps) => {
   if (layout.state === 'hidden') return null
 
   const { id, row, col, mergeRange, state } = layout
-  const { isBase, category, version, backgroundColor, textColor } = settings
+  const { isBase, category, version, backgroundColor, textColor } = setting
   const isMaster = state === 'master' && mergeRange
 
-  const visibleStartRow = isMaster
-    ? getVisibleIndex(mergeRange.startRow, hiddenRows)
-    : getVisibleIndex(row, hiddenRows)
-  const visibleEndRow = isMaster ? getVisibleIndex(mergeRange.endRow, hiddenRows) : 0
-  const visibleStartCol = isMaster
-    ? getVisibleIndex(mergeRange.startCol, hiddenCols)
-    : getVisibleIndex(col, hiddenCols)
-  const visibleEndCol = isMaster ? getVisibleIndex(mergeRange.endCol, hiddenCols) : 0
+  const visibleStartRow = isMaster ? mergeRange.startRow + 1 : row + 1
+  const visibleEndRow = isMaster ? mergeRange.endRow + 1 : 0
+  const visibleStartCol = isMaster ? mergeRange.startCol + 1 : col + 1
+  const visibleEndCol = isMaster ? mergeRange.endCol + 1 : 0
 
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform } = useSortable({
     id: layout.id
@@ -101,18 +95,13 @@ const Panel: React.FC<PanelProps> = ({ layout, settings, hiddenRows, hiddenCols 
       ]}
       style={style}
     >
-      <div className="flex items-center p-1pxr rounded-t bg-gray-200">
-        <PanelSettingsDropdown panelId={id} />
+      <div className="flex items-center p-1pxr rounded-t bg-gray-300">
+        <PanelSettingsDropdown panelId={id} sx={tw`shrink-0`} />
 
         <PanelCategorySelector
           panelId={id}
-          placeholder={
-            <span className="flex justify-center items-center gap-4pxr select-none">
-              {isBase ? <IconCrown size={16} /> : ''}
-              {version}
-            </span>
-          }
-          sx={tw`w-full h-32pxr rounded-md hover:bg-[#F4F4F5]`}
+          placeholder={version}
+          sx={tw`w-[calc(100%-64px)] h-32pxr rounded-md hover:bg-[#F4F4F5] font-bold`}
         />
 
         <Button
@@ -131,16 +120,6 @@ const Panel: React.FC<PanelProps> = ({ layout, settings, hiddenRows, hiddenCols 
       {renderPanel()}
     </div>
   )
-}
-
-function getVisibleIndex(index: number, hiddenSet: Set<number>): number {
-  let visibleIndex = 0
-  for (let i = 0; i <= index; i++) {
-    if (!hiddenSet.has(i)) {
-      visibleIndex++
-    }
-  }
-  return visibleIndex
 }
 
 export default Panel

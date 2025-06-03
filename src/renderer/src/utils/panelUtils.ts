@@ -114,28 +114,3 @@ export function unmergePanel(panels: TPanelLayout[], masterId: string): TPanelLa
     return panel
   })
 }
-
-export function setPanelsVisibilityWithRestore(
-  panels: TPanelLayout[],
-  options: { hiddenRows: Set<number>; hiddenCols: Set<number> }
-): TPanelLayout[] {
-  const { hiddenRows, hiddenCols } = options
-
-  return panels.map((panel) => {
-    const shouldHide = hiddenRows.has(panel.row) || hiddenCols.has(panel.col)
-
-    if (shouldHide) {
-      if (!panel.originalState) {
-        // 처음 숨길 때만 현재 상태를 저장
-        return { ...panel, originalState: panel.state, state: 'hidden' }
-      }
-      return { ...panel, state: 'hidden' }
-    } else {
-      if (panel.originalState) {
-        // 다시 보일 때는 원래 상태로 복원
-        return { ...panel, state: panel.originalState, originalState: undefined }
-      }
-      return panel // 원래 숨기기 대상이 아니었다면 그대로 유지
-    }
-  })
-}
