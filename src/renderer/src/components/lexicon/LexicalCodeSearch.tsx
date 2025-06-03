@@ -1,7 +1,4 @@
-import {
-  readWriteLexicalCodeSearchResultAtom,
-  readWriteLexicalCodeSearchAtom
-} from '@renderer/store'
+import { lexicalCodeSearchConditionAtom, lexicalCodeSearchResultAtom } from '@renderer/store'
 import { useAtom, useSetAtom } from 'jotai'
 import { useEffect, useRef, useState } from 'react'
 import Button from '../common/Button'
@@ -16,8 +13,8 @@ const FIXED_INPUT_COUNT = 3
 export default function LexicalCodeSearch(): JSX.Element {
   const firstInputRef = useRef<HTMLInputElement>(null)
 
-  const [searchCondition, setSearchCondition] = useAtom(readWriteLexicalCodeSearchAtom)
-  const setLexicalCodeSearchResult = useSetAtom(readWriteLexicalCodeSearchResultAtom)
+  const [searchCondition, setSearchCondition] = useAtom(lexicalCodeSearchConditionAtom)
+  const setLexicalCodeSearchResult = useSetAtom(lexicalCodeSearchResultAtom)
   const { codes } = searchCondition
 
   const [tempSearchCondition, setTempSearchCondition] = useState({ ...searchCondition })

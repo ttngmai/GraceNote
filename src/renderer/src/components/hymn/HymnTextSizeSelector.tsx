@@ -1,9 +1,9 @@
 import CustomSelect from '../common/CustomSelect'
 import { useAtom } from 'jotai'
-import { readWriteHymnTextSizeAtom } from '@renderer/store'
+import { hymnTextSizeAtom } from '@renderer/store'
 
 export default function HymnTextSizeSelector(): JSX.Element {
-  const [hymnTextSize, setHymnTextSize] = useAtom(readWriteHymnTextSizeAtom)
+  const [hymnTextSize, setHymnTextSize] = useAtom(hymnTextSizeAtom)
 
   return (
     <div className="flex items-center shrink-0 w-fit gap-8pxr">

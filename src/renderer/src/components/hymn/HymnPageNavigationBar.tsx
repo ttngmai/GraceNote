@@ -4,13 +4,13 @@ import HymnPlayer from './HymnPlayer'
 import * as Separator from '@radix-ui/react-separator'
 import HymnSearch from './HymnSearch'
 import { useAtomValue } from 'jotai'
-import { readWriteHymnAtom, readWriteHymnDisplayModeAtom } from '@renderer/store'
+import { hymnAtom, hymnDisplayModeAtom } from '@renderer/store'
 import HymnDisplayModeToggleButton from './HymnDisplayModeToggleButton'
 import HymnTextSizeSelector from './HymnTextSizeSelector'
 
 export default function HymnPageNavigation(): JSX.Element {
-  const hymn = useAtomValue(readWriteHymnAtom)
-  const hymnDisplayMode = useAtomValue(readWriteHymnDisplayModeAtom)
+  const hymn = useAtomValue(hymnAtom)
+  const hymnDisplayMode = useAtomValue(hymnDisplayModeAtom)
 
   const [hymnAudioPath, setHymnAudioPath] = useState<string>('')
 

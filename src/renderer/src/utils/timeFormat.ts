@@ -2,7 +2,7 @@ function pad(string): string {
   return ('0' + string).slice(-2)
 }
 
-function formatTime(seconds): string {
+export function formatTime(seconds): string {
   if (isNaN(seconds)) {
     return `00:00`
   }
@@ -18,5 +18,3 @@ function formatTime(seconds): string {
 
   return `${mm}:${ss}`
 }
-
-export default formatTime

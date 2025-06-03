@@ -1,9 +1,9 @@
 import { useAtom } from 'jotai'
-import { readWritePanelTextSizeAtom } from '@renderer/store'
+import { panelTextSizeAtom } from '@renderer/store'
 import CustomSelect from './CustomSelect'
 
 export default function PanelTextSizeSelector(): JSX.Element {
-  const [panelTextSize, setPanelTextSize] = useAtom(readWritePanelTextSizeAtom)
+  const [panelTextSize, setPanelTextSize] = useAtom(panelTextSizeAtom)
 
   return (
     <CustomSelect

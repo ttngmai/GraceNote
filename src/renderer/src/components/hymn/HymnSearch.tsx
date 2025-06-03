@@ -1,12 +1,12 @@
 import * as Label from '@radix-ui/react-label'
-import { readWriteHymnAtom } from '@renderer/store'
+import { hymnAtom } from '@renderer/store'
 import { useSetAtom } from 'jotai'
 import Button from '../common/Button'
 import { IconSearch } from '@tabler/icons-react'
 import { useState } from 'react'
 
 export default function HymnSearch(): JSX.Element {
-  const setHymn = useSetAtom(readWriteHymnAtom)
+  const setHymn = useSetAtom(hymnAtom)
 
   const [keyword, setKeyword] = useState<string>('')
 

@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai'
-import { readWritePanelGridAtom } from '@renderer/store'
+import { panelGridAtom } from '@renderer/store'
 import {
   closestCenter,
   DndContext,
@@ -13,7 +13,7 @@ import Panel from './Panel'
 import { swapPanelPositions } from '@renderer/utils/panelUtils'
 
 export default function PanelGrid(): JSX.Element {
-  const [panelGrid, setPanelGrid] = useAtom(readWritePanelGridAtom)
+  const [panelGrid, setPanelGrid] = useAtom(panelGridAtom)
   const { panels, settings } = panelGrid
 
   const sensors = useSensors(useSensor(PointerSensor))

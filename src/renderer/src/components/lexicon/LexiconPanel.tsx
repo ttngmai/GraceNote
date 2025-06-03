@@ -1,4 +1,4 @@
-import { readWriteLexicalCodeAtom, readWritePanelTextSizeAtom } from '@renderer/store'
+import { panelTextSizeAtom, lexicalCodeAtom } from '@renderer/store'
 import { TLexicon } from '@shared/models'
 import { useAtomValue } from 'jotai'
 import { useEffect, useState } from 'react'
@@ -14,8 +14,8 @@ export default function LexiconPanel({
   backgroundColor,
   textColor
 }: LexiconPanelProps): JSX.Element {
-  const panelTextSize = useAtomValue(readWritePanelTextSizeAtom)
-  const lexicalCode = useAtomValue(readWriteLexicalCodeAtom)
+  const panelTextSize = useAtomValue(panelTextSizeAtom)
+  const lexicalCode = useAtomValue(lexicalCodeAtom)
 
   const [lexiconData, setLexiconData] = useState<TLexicon[]>()
 

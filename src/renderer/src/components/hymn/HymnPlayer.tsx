@@ -4,7 +4,7 @@ import { OnProgressProps } from 'react-player/base'
 import * as Slider from '@radix-ui/react-slider'
 import { IconPlayerPause, IconPlayerPlay, IconVolume, IconVolumeOff } from '@tabler/icons-react'
 import Button from '../common/Button'
-import formatTime from '@renderer/utils/timeFormat'
+import { formatTime } from '@renderer/utils/timeFormat'
 
 type HymnPlayerProps = {
   url: string

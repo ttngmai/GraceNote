@@ -1,4 +1,4 @@
-import { readWriteBibleVerseSearchAtom, readWriteBibleVerseSearchResultAtom } from '@renderer/store'
+import { bibleVerseSearchConditionAtom, bibleVerseSearchResultAtom } from '@renderer/store'
 import { useAtom, useSetAtom } from 'jotai'
 import { useEffect, useState } from 'react'
 import CustomSelect from '../common/CustomSelect'
@@ -11,8 +11,8 @@ import Button from '../common/Button'
 const FIXED_INPUT_COUNT = 3
 
 export default function BibleVerseSearch(): JSX.Element {
-  const [searchCondition, setSearchCondition] = useAtom(readWriteBibleVerseSearchAtom)
-  const setBibleVerseSearchResult = useSetAtom(readWriteBibleVerseSearchResultAtom)
+  const [searchCondition, setSearchCondition] = useAtom(bibleVerseSearchConditionAtom)
+  const setBibleVerseSearchResult = useSetAtom(bibleVerseSearchResultAtom)
   const { keywords } = searchCondition
 
   const [tempSearchCondition, setTempSearchCondition] = useState(searchCondition)

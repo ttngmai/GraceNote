@@ -1,9 +1,9 @@
 import {
-  readWriteBookAtom,
-  readWriteChapterAtom,
-  readWriteLexicalCodeAtom,
-  readWriteVerseAtom,
-  readWritePanelTextSizeAtom
+  panelTextSizeAtom,
+  bookAtom,
+  chapterAtom,
+  verseAtom,
+  lexicalCodeAtom
 } from '@renderer/store'
 import isLight from '@renderer/utils/contrastColor'
 import { BIBLE_COUNT_INFO } from '@shared/constants'
@@ -27,11 +27,11 @@ export default function CodedBiblePanel({
 }: CodedBiblePanelProps): JSX.Element {
   const verseRefs = useRef<null[] | HTMLElement[]>([]) // 각 절 HTML 요소의 참조 리스트
 
-  const panelTextSize = useAtomValue(readWritePanelTextSizeAtom)
-  const book = useAtomValue(readWriteBookAtom)
-  const chapter = useAtomValue(readWriteChapterAtom)
-  const [verse, setVerse] = useAtom(readWriteVerseAtom)
-  const setLexicalCode = useSetAtom(readWriteLexicalCodeAtom)
+  const panelTextSize = useAtomValue(panelTextSizeAtom)
+  const book = useAtomValue(bookAtom)
+  const chapter = useAtomValue(chapterAtom)
+  const [verse, setVerse] = useAtom(verseAtom)
+  const setLexicalCode = useSetAtom(lexicalCodeAtom)
 
   const [bibleData, setBibleData] = useState<TBible[]>()
   const [lastVerse, setLastVerse] = useState<number>(0)

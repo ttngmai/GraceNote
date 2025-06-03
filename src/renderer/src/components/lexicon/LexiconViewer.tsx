@@ -1,23 +1,19 @@
-import {
-  readWriteLexicalCodeSearchAtom,
-  readWriteLexicalCodeSearchResultAtom
-} from '@renderer/store'
+import { lexicalCodeSearchConditionAtom, lexicalCodeSearchResultAtom } from '@renderer/store'
 import { BOOK_INFO } from '@shared/constants'
 import { useAtom, useAtomValue } from 'jotai'
 import tw, { TwStyle } from 'twin.macro'
 import Pagination from '../common/Pagination'
 import { useEffect, useRef, useState } from 'react'
 import { TBible } from '@shared/models'
+import { formatNumberWithComma } from '@renderer/utils/numberFormat'
 
 export default function LexiconViewer(): JSX.Element {
   const keywordMatchedVersesScrollRef = useRef<HTMLDivElement>(null)
   const fullChaptersWithKeywordScrollRef = useRef<HTMLDivElement>(null)
 
-  const searchCondition = useAtomValue(readWriteLexicalCodeSearchAtom)
+  const searchCondition = useAtomValue(lexicalCodeSearchConditionAtom)
   const { version, bookRange, codes } = searchCondition
-  const [lexicalCodeSearchResult, setLexicalCodeSearchResult] = useAtom(
-    readWriteLexicalCodeSearchResultAtom
-  )
+  const [lexicalCodeSearchResult, setLexicalCodeSearchResult] = useAtom(lexicalCodeSearchResultAtom)
   const {
     data: keywordMatchedVerses,
     totalCount,
@@ -108,7 +104,7 @@ export default function LexiconViewer(): JSX.Element {
               {' ~ '}
               {BOOK_INFO.find((el) => el.id === bookRange[1])?.shortName || ''} {`(${version})`}
               {' : '}
-              {totalCount} 구절
+              {formatNumberWithComma(totalCount)} 구절
             </div>
             <div className="flex gap-[0.25em]">
               ◎

@@ -1,7 +1,7 @@
 import { BIBLE_COUNT_INFO, BOOK_INFO } from '@shared/constants'
 import { useEffect, useState } from 'react'
 import { useAtomValue } from 'jotai'
-import { readWriteBookAtom, readWriteChapterAtom } from '@renderer/store'
+import { bookAtom, chapterAtom } from '@renderer/store'
 import useSearchBible from '@renderer/hooks/useSearchBible'
 import { IconArrowLeft, IconArrowRight } from '@tabler/icons-react'
 import CustomSelect from '../common/CustomSelect'
@@ -9,8 +9,8 @@ import * as Popover from '@radix-ui/react-popover'
 import Button from '../common/Button'
 
 export default function BibleSelector(): JSX.Element {
-  const book = useAtomValue(readWriteBookAtom)
-  const chapter = useAtomValue(readWriteChapterAtom)
+  const book = useAtomValue(bookAtom)
+  const chapter = useAtomValue(chapterAtom)
 
   const [lastChapter, setLastChapter] = useState<number>(0)
   const [openBookSelector, setOpenBookSelector] = useState(false)

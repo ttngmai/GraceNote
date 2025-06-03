@@ -9,8 +9,8 @@
   "compilerOptions": {
     "module": "node16",
     "moduleResolution": "node16",
-    "composite": true,
     "types": ["electron-vite/node"],
+    "composite": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/main/*"],

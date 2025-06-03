@@ -1,10 +1,10 @@
-import { readWriteBookAtom, readWriteChapterAtom, readWriteVerseAtom } from '@renderer/store'
+import { bookAtom, chapterAtom, verseAtom } from '@renderer/store'
 import { useSetAtom } from 'jotai'
 
 export default function useSearchBible(): (book: number, chapter: number, verse: number) => void {
-  const setBook = useSetAtom(readWriteBookAtom)
-  const setChapter = useSetAtom(readWriteChapterAtom)
-  const setVerse = useSetAtom(readWriteVerseAtom)
+  const setBook = useSetAtom(bookAtom)
+  const setChapter = useSetAtom(chapterAtom)
+  const setVerse = useSetAtom(verseAtom)
 
   const searchBible = (book: number, chapter: number, verse: number): void => {
     setBook(book)

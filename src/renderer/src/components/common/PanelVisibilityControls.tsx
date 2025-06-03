@@ -1,6 +1,6 @@
 import React from 'react'
 import { useAtom } from 'jotai'
-import { readWritePanelGridAtom } from '@renderer/store'
+import { panelGridAtom } from '@renderer/store'
 import tw, { css } from 'twin.macro'
 import { TPanelLayout } from '@shared/types'
 import { mergePanels, unmergePanel } from '@renderer/utils/panelUtils'
@@ -9,7 +9,7 @@ import isLight from '@renderer/utils/contrastColor'
 import { IconEye, IconEyeClosed } from '@tabler/icons-react'
 
 const PanelVisibilityControls: React.FC = () => {
-  const [panelGrid, setPanelGrid] = useAtom(readWritePanelGridAtom)
+  const [panelGrid, setPanelGrid] = useAtom(panelGridAtom)
   const { panels, settings } = panelGrid
 
   const gridButtons: (TPanelLayout | null)[][] = Array.from({ length: PANEL_ROWS }, () =>

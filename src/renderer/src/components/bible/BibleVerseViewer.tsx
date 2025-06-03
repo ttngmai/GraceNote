@@ -1,20 +1,19 @@
-import { readWriteBibleVerseSearchAtom, readWriteBibleVerseSearchResultAtom } from '@renderer/store'
+import { bibleVerseSearchConditionAtom, bibleVerseSearchResultAtom } from '@renderer/store'
 import { BOOK_INFO } from '@shared/constants'
 import { useAtom, useAtomValue } from 'jotai'
 import { useEffect, useRef, useState } from 'react'
 import tw, { TwStyle } from 'twin.macro'
 import Pagination from '../common/Pagination'
 import { TBible } from '@shared/models'
+import { formatNumberWithComma } from '@renderer/utils/numberFormat'
 
 export default function BibleVerseViewer(): JSX.Element {
   const keywordMatchedVersesScrollRef = useRef<HTMLDivElement>(null)
   const fullChaptersWithKeywordScrollRef = useRef<HTMLDivElement>(null)
 
-  const searchCondition = useAtomValue(readWriteBibleVerseSearchAtom)
+  const searchCondition = useAtomValue(bibleVerseSearchConditionAtom)
   const { version, bookRange, keywords } = searchCondition
-  const [bibleVerseSearchResult, setBibleVerseSearchResult] = useAtom(
-    readWriteBibleVerseSearchResultAtom
-  )
+  const [bibleVerseSearchResult, setBibleVerseSearchResult] = useAtom(bibleVerseSearchResultAtom)
   const { data: keywordMatchedVerses, totalCount, totalPages, currentPage } = bibleVerseSearchResult
 
   const [selectedBible, setSelectedBible] = useState<{
@@ -98,7 +97,7 @@ export default function BibleVerseViewer(): JSX.Element {
               {' ~ '}
               {BOOK_INFO.find((el) => el.id === bookRange[1])?.shortName || ''} {`(${version})`}
               {' : '}
-              {totalCount} 구절
+              {formatNumberWithComma(totalCount)} 구절
             </div>
             <div className="flex gap-[0.25em]">
               ◎

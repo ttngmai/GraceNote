@@ -6,7 +6,7 @@ import Button from './Button'
 import ColorPickerModal from './ColorPickerModal'
 import ModalPortal from '@renderer/utils/ModalPortal'
 import tw, { css } from 'twin.macro'
-import { readWritePanelGridAtom } from '@renderer/store'
+import { panelGridAtom } from '@renderer/store'
 
 type PanelStylesModalProps = {
   panelId: string
@@ -14,7 +14,7 @@ type PanelStylesModalProps = {
 }
 
 export default function PanelStylesModal({ panelId, onClose }: PanelStylesModalProps): JSX.Element {
-  const [panelGrid, setPanelGrid] = useAtom(readWritePanelGridAtom)
+  const [panelGrid, setPanelGrid] = useAtom(panelGridAtom)
   const { settings } = panelGrid
 
   const [openPanelBackgroundColorPickerModal, setOpenPanelBackgroundColorPickerModal] =

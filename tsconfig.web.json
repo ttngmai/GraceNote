@@ -16,6 +16,7 @@
     "paths": {
       "@renderer/*": ["src/renderer/src/*"],
       "@shared/*": ["src/shared/*"]
-    }
+    },
+    "strictNullChecks": true
   }
 }

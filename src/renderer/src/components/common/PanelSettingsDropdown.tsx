@@ -6,7 +6,7 @@ import { useAtom } from 'jotai'
 import { useState } from 'react'
 import ModalPortal from '@renderer/utils/ModalPortal'
 import PanelStylesModal from './PanelStylesModal'
-import { readWritePanelGridAtom } from '@renderer/store'
+import { panelGridAtom } from '@renderer/store'
 import { mergePanels, unmergePanel } from '@renderer/utils/panelUtils'
 import { PANEL_ROWS } from '@shared/constants'
 
@@ -19,7 +19,7 @@ export default function PanelSettingsDropdown({
   panelId,
   sx
 }: PanelSettingsDropdownProps): JSX.Element {
-  const [panelGrid, setPanelGrid] = useAtom(readWritePanelGridAtom)
+  const [panelGrid, setPanelGrid] = useAtom(panelGridAtom)
   const panel = panelGrid.panels.find((p) => p.id === panelId)
   const settings = panelGrid.settings[panelId]
 

@@ -1,9 +1,4 @@
-import {
-  readWriteBookAtom,
-  readWriteChapterAtom,
-  readWritePanelTextSizeAtom,
-  readWriteVerseAtom
-} from '@renderer/store'
+import { panelTextSizeAtom, bookAtom, chapterAtom, verseAtom } from '@renderer/store'
 import isLight from '@renderer/utils/contrastColor'
 import { BIBLE_COUNT_INFO } from '@shared/constants'
 import { TBible } from '@shared/models'
@@ -24,10 +19,10 @@ export default function CommentaryPanel({
 }: CommentaryPanelProps): JSX.Element {
   const verseRefs = useRef<null[] | HTMLElement[]>([]) // 각 절 HTML 요소의 참조 리스트
 
-  const panelTextSize = useAtomValue(readWritePanelTextSizeAtom)
-  const book = useAtomValue(readWriteBookAtom)
-  const chapter = useAtomValue(readWriteChapterAtom)
-  const verse = useAtomValue(readWriteVerseAtom)
+  const panelTextSize = useAtomValue(panelTextSizeAtom)
+  const book = useAtomValue(bookAtom)
+  const chapter = useAtomValue(chapterAtom)
+  const verse = useAtomValue(verseAtom)
 
   const [bibleData, setBibleData] = useState<TBible[]>()
   const [lastVerse, setLastVerse] = useState<number>(0)

@@ -4,7 +4,7 @@ import { PanelCategory } from '@shared/types'
 import { TwStyle } from 'twin.macro'
 import { useAtom } from 'jotai'
 import { PANEL_CATEGORIES_AND_VERSIONS } from '@shared/constants'
-import { readWritePanelGridAtom } from '@renderer/store'
+import { panelGridAtom } from '@renderer/store'
 import { Textfit } from 'react-textfit'
 
 type PanelCategorySelectorProps = {
@@ -18,7 +18,7 @@ export default function PanelCategorySelector({
   placeholder,
   sx
 }: PanelCategorySelectorProps): JSX.Element {
-  const [panelGrid, setPanelGrid] = useAtom(readWritePanelGridAtom)
+  const [panelGrid, setPanelGrid] = useAtom(panelGridAtom)
 
   const selectPanelCategoryAndVersion = (
     id: string,

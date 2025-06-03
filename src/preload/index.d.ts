@@ -15,6 +15,7 @@ declare global {
       store: {
         get: (key: string) => any
         set: (key: string, value: any) => void
+        delete: (key: string) => void
       }
       menu: {
         showContextMenu: (elementType: string, imageUrl?: string) => void

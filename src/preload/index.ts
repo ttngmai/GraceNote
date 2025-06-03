@@ -25,6 +25,9 @@ try {
       },
       set(property, val) {
         ipcRenderer.send('electron-store-set', property, val)
+      },
+      delete(key) {
+        return ipcRenderer.sendSync('electron-store-delete', key)
       }
     },
     menu: {

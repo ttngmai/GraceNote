@@ -1,13 +1,13 @@
 import Button from '../common/Button'
 import { IconChevronLeft, IconChevronRight, IconSearch } from '@tabler/icons-react'
-import { readWriteLexicalCodeAtom, readWriteLexicalCodeSearchAtom } from '@renderer/store'
+import { lexicalCodeAtom, lexicalCodeSearchConditionAtom } from '@renderer/store'
 import { useAtom } from 'jotai'
 import { useEffect, useState } from 'react'
 import * as Label from '@radix-ui/react-label'
 
 export default function SimpleLexicalCodeSearch(): JSX.Element {
-  const [lexicalCode, setLexicalCode] = useAtom(readWriteLexicalCodeAtom)
-  const [searchCondition, setSearchCondition] = useAtom(readWriteLexicalCodeSearchAtom)
+  const [lexicalCode, setLexicalCode] = useAtom(lexicalCodeAtom)
+  const [searchCondition, setSearchCondition] = useAtom(lexicalCodeSearchConditionAtom)
 
   const [keyword, setKeyword] = useState<string>(lexicalCode)
 

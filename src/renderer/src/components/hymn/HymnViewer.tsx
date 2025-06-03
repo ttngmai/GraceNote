@@ -1,15 +1,11 @@
-import {
-  readWriteHymnAtom,
-  readWriteHymnDisplayModeAtom,
-  readWriteHymnTextSizeAtom
-} from '@renderer/store'
+import { hymnAtom, hymnDisplayModeAtom, hymnTextSizeAtom } from '@renderer/store'
 import { useAtomValue } from 'jotai'
 import { useEffect, useState } from 'react'
 
 export default function HymnViewer(): JSX.Element {
-  const hymn = useAtomValue(readWriteHymnAtom)
-  const hymnDisplayMode = useAtomValue(readWriteHymnDisplayModeAtom)
-  const hymnTextSize = useAtomValue(readWriteHymnTextSizeAtom)
+  const hymn = useAtomValue(hymnAtom)
+  const hymnDisplayMode = useAtomValue(hymnDisplayModeAtom)
+  const hymnTextSize = useAtomValue(hymnTextSizeAtom)
 
   const [hymnSheetPath, setHymnSheetPath] = useState<string>()
 
