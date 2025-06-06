@@ -1,25 +1,31 @@
 import { lexicalCodeSearchConditionAtom, lexicalCodeSearchResultAtom } from '@renderer/store'
 import { BOOK_INFO } from '@shared/constants'
-import { useAtom, useAtomValue } from 'jotai'
+import { useAtomValue } from 'jotai'
 import tw, { TwStyle } from 'twin.macro'
-import Pagination from '../common/Pagination'
-import { useEffect, useRef, useState } from 'react'
+import { forwardRef, Key, useEffect, useRef, useState } from 'react'
 import { TBible } from '@shared/models'
 import { formatNumberWithComma } from '@renderer/utils/numberFormat'
+import Spinner from '../common/Spinner'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { fetchLexicons } from '@renderer/api/lexicon'
+import { Virtuoso, VirtuosoHandle } from 'react-virtuoso'
 
 export default function LexiconViewer(): JSX.Element {
-  const keywordMatchedVersesScrollRef = useRef<HTMLDivElement>(null)
+  const keywordMatchedVersesScrollRef = useRef<VirtuosoHandle>(null)
   const fullChaptersWithKeywordScrollRef = useRef<HTMLDivElement>(null)
 
   const searchCondition = useAtomValue(lexicalCodeSearchConditionAtom)
   const { version, bookRange, codes } = searchCondition
-  const [lexicalCodeSearchResult, setLexicalCodeSearchResult] = useAtom(lexicalCodeSearchResultAtom)
-  const {
-    data: keywordMatchedVerses,
-    totalCount,
-    totalPages,
-    currentPage
-  } = lexicalCodeSearchResult
+  const lexicalCodeSearchResult = useAtomValue(lexicalCodeSearchResultAtom)
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
+    queryKey: ['lexicons', searchCondition],
+    queryFn: ({ pageParam = 1 }) => fetchLexicons({ pageParam, ...searchCondition }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage.currentPage < lastPage.totalPages ? lastPage.currentPage + 1 : undefined
+  })
+  const verses: TBible[] = data?.pages.flatMap((p) => p.data) ?? []
 
   const [selectedBible, setSelectedBible] = useState<{
     version: string
@@ -30,37 +36,9 @@ export default function LexiconViewer(): JSX.Element {
   const [bibleData, setBibleData] = useState<TBible[]>()
   const [bibleDataVersion, setBibleDataVersion] = useState<string>('')
 
-  // 각 절 렌더링
-  const renderVerseList = (): JSX.Element[] | null => {
-    if (!keywordMatchedVerses) return null
-
-    return keywordMatchedVerses.map(({ book, chapter, verse, btext }) => (
-      <KeywordMatchedVersesItem
-        key={`${book}-${chapter}-${verse}`}
-        version={version}
-        book={book}
-        chapter={chapter}
-        verse={verse}
-        btext={btext}
-        codes={codes}
-        isLight={true}
-        onLabelClick={(version, book, chapter, verse) => {
-          setSelectedBible({ version, book, chapter, verse })
-        }}
-      />
-    ))
-  }
-
-  const handlePageChange = async (page: number): Promise<void> => {
-    const result = await window.context.findLexicalCodeFromBible({ ...searchCondition, page })
-    if (result) {
-      setLexicalCodeSearchResult(result)
-    }
-  }
-
   useEffect(() => {
     if (keywordMatchedVersesScrollRef.current) {
-      keywordMatchedVersesScrollRef.current.scrollTop = 0
+      keywordMatchedVersesScrollRef.current.scrollToIndex({ index: 0 })
     }
   }, [lexicalCodeSearchResult])
 
@@ -93,18 +71,15 @@ export default function LexiconViewer(): JSX.Element {
 
   return (
     <div className="flex w-full">
-      <div
-        ref={keywordMatchedVersesScrollRef}
-        className="flex-1 p-16pxr overflow-y-auto bg-emerald-100"
-      >
+      <div className="flex-1 overflow-hidden bg-emerald-100">
         {searchCondition && (
-          <div className="flex flex-col mb-16pxr">
+          <div className="flex flex-col p-16pxr">
             <div>
               ◆ {BOOK_INFO.find((el) => el.id === bookRange[0])?.shortName || ''}
               {' ~ '}
               {BOOK_INFO.find((el) => el.id === bookRange[1])?.shortName || ''} {`(${version})`}
               {' : '}
-              {formatNumberWithComma(totalCount)} 구절
+              {formatNumberWithComma(lexicalCodeSearchResult.totalCount)} 구절
             </div>
             <div className="flex gap-[0.25em]">
               ◎
@@ -119,12 +94,18 @@ export default function LexiconViewer(): JSX.Element {
             </div>
           </div>
         )}
-        {renderVerseList()}
-        <div className="sticky -bottom-16pxr flex justify-center -mx-16pxr -mb-16pxr py-8pxr bg-emerald-100">
-          <Pagination
-            totalPages={totalPages}
-            currentPage={currentPage}
-            onPageChange={handlePageChange}
+        <div className="w-full h-[calc(100%-80px)]">
+          <VerseList
+            ref={keywordMatchedVersesScrollRef}
+            verses={verses}
+            version={version}
+            codes={codes}
+            fetchNextPage={fetchNextPage}
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+            onLabelClick={(version, book, chapter, verse) => {
+              setSelectedBible({ version, book, chapter, verse })
+            }}
           />
         </div>
       </div>
@@ -248,7 +229,72 @@ const parseRawTextForLexicon = (
   })
 }
 
+const VerseListContent = forwardRef<HTMLDivElement>((props, ref) => {
+  return <div ref={ref} {...props} className="p-16pxr" />
+})
+VerseListContent.displayName = 'VerseListContent'
+
+const VerseListFooter = (): JSX.Element => <div className="h-16pxr" />
+
+type VerseListProps = {
+  verses: TBible[]
+  version: string
+  codes: string[]
+  fetchNextPage
+  hasNextPage: boolean
+  isFetchingNextPage: boolean
+  onLabelClick: KeywordMatchedVersesItemProps['onLabelClick']
+}
+
+const VerseList = forwardRef<VirtuosoHandle, VerseListProps>(
+  (
+    { verses, version, codes, fetchNextPage, hasNextPage, isFetchingNextPage, onLabelClick },
+    ref
+  ) => {
+    return (
+      <Virtuoso
+        ref={ref}
+        data={verses}
+        endReached={() => {
+          if (hasNextPage && !isFetchingNextPage) {
+            fetchNextPage()
+          }
+        }}
+        itemContent={(_, { book, chapter, verse, btext }) => {
+          return (
+            <>
+              <KeywordMatchedVersesItem
+                version={version}
+                book={book}
+                chapter={chapter}
+                verse={verse}
+                btext={btext}
+                codes={codes}
+                isLight={true}
+                onLabelClick={onLabelClick}
+              />
+              {isFetchingNextPage && (
+                <div className="flex justify-center items-center gap-4pxr w-full pt-16pxr">
+                  <p>로딩 중</p>
+                  <Spinner />
+                </div>
+              )}
+            </>
+          )
+        }}
+        components={{
+          List: VerseListContent,
+          Footer: VerseListFooter
+        }}
+        className="overflow-y-scroll"
+      />
+    )
+  }
+)
+VerseList.displayName = 'VerseList'
+
 type KeywordMatchedVersesItemProps = {
+  key?: Key | null | undefined
   version: string
   book: number
   chapter: number
@@ -293,6 +339,7 @@ const KeywordMatchedVersesItem = ({
 }
 
 type FullChaptersWithKeywordItemProps = {
+  key?: Key | null | undefined
   version: string
   verse: number
   btext: string

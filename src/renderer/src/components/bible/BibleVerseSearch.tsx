@@ -1,6 +1,6 @@
 import { bibleVerseSearchConditionAtom, bibleVerseSearchResultAtom } from '@renderer/store'
 import { useAtom, useSetAtom } from 'jotai'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import CustomSelect from '../common/CustomSelect'
 import { PANEL_CATEGORIES_AND_VERSIONS } from '@shared/constants'
 import { PanelCategory } from '@shared/types'
@@ -11,6 +11,8 @@ import Button from '../common/Button'
 const FIXED_INPUT_COUNT = 3
 
 export default function BibleVerseSearch(): JSX.Element {
+  const firstInputRef = useRef<HTMLInputElement>(null)
+
   const [searchCondition, setSearchCondition] = useAtom(bibleVerseSearchConditionAtom)
   const setBibleVerseSearchResult = useSetAtom(bibleVerseSearchResultAtom)
   const { keywords } = searchCondition
@@ -40,6 +42,11 @@ export default function BibleVerseSearch(): JSX.Element {
 
   useEffect(() => {
     handleSearchBibleVerse()
+
+    setTimeout(() => {
+      firstInputRef.current?.focus()
+      firstInputRef.current?.select()
+    }, 0)
   }, [])
 
   useEffect(() => {
@@ -84,6 +91,7 @@ export default function BibleVerseSearch(): JSX.Element {
           {[0, 1, 2].map((index) => (
             <input
               key={index}
+              ref={index === 0 ? firstInputRef : undefined}
               type="text"
               value={tempKeywords[index] || ''}
               onChange={(e) => handleKeywordChange(index, e.target.value)}

@@ -22,7 +22,7 @@ export const findKeywordFromBible: TFindKeywordFromBible = async ({
   keywords,
   matchType,
   page = 1,
-  pageSize = 100
+  pageSize = 500
 }) => {
   try {
     const db = getBibleDB(version)
@@ -92,7 +92,7 @@ export const findLexicalCodeFromBible: TFindLexicalCodeFromBible = async ({
   codes,
   matchType,
   page = 1,
-  pageSize = 100
+  pageSize = 500
 }) => {
   try {
     const db = getBibleDB(version)

@@ -1658,6 +1658,18 @@
   resolved "https://registry.yarnpkg.com/@tabler/icons/-/icons-3.31.0.tgz#92d39dc336f2e3e312170420b00ffe9ca474925e"
   integrity sha512-dblAdeKY3+GA1U+Q9eziZ0ooVlZMHsE8dqP0RkwvRtEsAULoKOYaCUOcJ4oW1DjWegdxk++UAt2SlQVnmeHv+g==
 
+"@tanstack/query-core@5.80.2":
+  version "5.80.2"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.80.2.tgz#1e0e2a35ff2a5f5a613706fbc6fafa395f1ec909"
+  integrity sha512-g2Es97uwFk7omkWiH9JmtLWSA8lTUFVseIyzqbjqJEEx7qN+Hg6jbBdDvelqtakamppaJtGORQ64hEJ5S6ojSg==
+
+"@tanstack/react-query@^5.80.2":
+  version "5.80.2"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-5.80.2.tgz#42f1231a9f7cc78fb0906f38b7851d4662cbb95c"
+  integrity sha512-LfA0SVheJBOqC8RfJw/JbOW3yh2zuONQeWU5Prjm7yjUGUONeOedky1Bj39Cfj8MRdXrZV+DxNT7/DN/M907lQ==
+  dependencies:
+    "@tanstack/query-core" "5.80.2"
+
 "@tootallnate/once@2":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-2.0.0.tgz#f544a148d3ab35801c1f633a7441fd87c2e484bf"
@@ -5463,6 +5475,11 @@ react-textfit@^1.1.1:
   dependencies:
     process "^0.11.10"
     prop-types "^15.7.2"
+
+react-virtuoso@^4.12.8:
+  version "4.12.8"
+  resolved "https://registry.yarnpkg.com/react-virtuoso/-/react-virtuoso-4.12.8.tgz#db1dbba617f91c1dcd760aa90e09ef991e65a356"
+  integrity sha512-NMMKfDBr/+xZZqCQF3tN1SZsh6FwOJkYgThlfnsPLkaEhdyQo0EuWUzu3ix6qjnI7rYwJhMwRGoJBi+aiDfGsA==
 
 react@^18.2.0:
   version "18.2.0"

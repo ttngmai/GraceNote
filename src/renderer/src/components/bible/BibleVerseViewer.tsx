@@ -1,20 +1,31 @@
 import { bibleVerseSearchConditionAtom, bibleVerseSearchResultAtom } from '@renderer/store'
 import { BOOK_INFO } from '@shared/constants'
-import { useAtom, useAtomValue } from 'jotai'
-import { useEffect, useRef, useState } from 'react'
+import { useAtomValue } from 'jotai'
+import { forwardRef, Key, useEffect, useRef, useState } from 'react'
 import tw, { TwStyle } from 'twin.macro'
-import Pagination from '../common/Pagination'
 import { TBible } from '@shared/models'
 import { formatNumberWithComma } from '@renderer/utils/numberFormat'
+import Spinner from '../common/Spinner'
+import { Virtuoso, VirtuosoHandle } from 'react-virtuoso'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { fetchBibleVerses } from '@renderer/api/bible'
 
 export default function BibleVerseViewer(): JSX.Element {
-  const keywordMatchedVersesScrollRef = useRef<HTMLDivElement>(null)
+  const keywordMatchedVersesScrollRef = useRef<VirtuosoHandle>(null)
   const fullChaptersWithKeywordScrollRef = useRef<HTMLDivElement>(null)
 
   const searchCondition = useAtomValue(bibleVerseSearchConditionAtom)
   const { version, bookRange, keywords } = searchCondition
-  const [bibleVerseSearchResult, setBibleVerseSearchResult] = useAtom(bibleVerseSearchResultAtom)
-  const { data: keywordMatchedVerses, totalCount, totalPages, currentPage } = bibleVerseSearchResult
+  const bibleVerseSearchResult = useAtomValue(bibleVerseSearchResultAtom)
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
+    queryKey: ['bibleVerses', searchCondition],
+    queryFn: ({ pageParam = 1 }) => fetchBibleVerses({ pageParam, ...searchCondition }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage.currentPage < lastPage.totalPages ? lastPage.currentPage + 1 : undefined
+  })
+  const verses: TBible[] = data?.pages.flatMap((p) => p.data) ?? []
 
   const [selectedBible, setSelectedBible] = useState<{
     version: string
@@ -24,37 +35,9 @@ export default function BibleVerseViewer(): JSX.Element {
   } | null>(null)
   const [bibleData, setBibleData] = useState<TBible[]>()
 
-  // 각 절 렌더링
-  const renderVerseList = (): JSX.Element[] | null => {
-    if (!keywordMatchedVerses) return null
-
-    return keywordMatchedVerses.map(({ book, chapter, verse, btext }) => (
-      <KeywordMatchedVersesItem
-        key={`${book}-${chapter}-${verse}`}
-        version={version}
-        book={book}
-        chapter={chapter}
-        verse={verse}
-        btext={btext}
-        keywords={keywords}
-        isLight={true}
-        onLabelClick={(version, book, chapter, verse) => {
-          setSelectedBible({ version, book, chapter, verse })
-        }}
-      />
-    ))
-  }
-
-  const handlePageChange = async (page: number): Promise<void> => {
-    const result = await window.context.findKeywordFromBible({ ...searchCondition, page })
-    if (result) {
-      setBibleVerseSearchResult(result)
-    }
-  }
-
   useEffect(() => {
     if (keywordMatchedVersesScrollRef.current) {
-      keywordMatchedVersesScrollRef.current.scrollTop = 0
+      keywordMatchedVersesScrollRef.current.scrollToIndex({ index: 0 })
     }
   }, [bibleVerseSearchResult])
 
@@ -86,18 +69,15 @@ export default function BibleVerseViewer(): JSX.Element {
 
   return (
     <div className="flex w-full">
-      <div
-        ref={keywordMatchedVersesScrollRef}
-        className="flex-1 p-16pxr overflow-y-auto bg-indigo-100"
-      >
+      <div className="flex-1 overflow-hidden bg-indigo-100">
         {searchCondition && (
-          <div className="flex flex-col mb-16pxr">
+          <div className="flex flex-col p-16pxr">
             <div>
               ◆ {BOOK_INFO.find((el) => el.id === bookRange[0])?.shortName || ''}
               {' ~ '}
               {BOOK_INFO.find((el) => el.id === bookRange[1])?.shortName || ''} {`(${version})`}
               {' : '}
-              {formatNumberWithComma(totalCount)} 구절
+              {formatNumberWithComma(bibleVerseSearchResult.totalCount)} 구절
             </div>
             <div className="flex gap-[0.25em]">
               ◎
@@ -112,12 +92,18 @@ export default function BibleVerseViewer(): JSX.Element {
             </div>
           </div>
         )}
-        {renderVerseList()}
-        <div className="sticky -bottom-16pxr flex justify-center -mx-16pxr -mb-16pxr py-8pxr bg-indigo-100">
-          <Pagination
-            totalPages={totalPages}
-            currentPage={currentPage}
-            onPageChange={handlePageChange}
+        <div className="w-full h-[calc(100%-80px)]">
+          <VerseList
+            ref={keywordMatchedVersesScrollRef}
+            verses={verses}
+            version={version}
+            keywords={keywords}
+            fetchNextPage={fetchNextPage}
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+            onLabelClick={(version, book, chapter, verse) => {
+              setSelectedBible({ version, book, chapter, verse })
+            }}
           />
         </div>
       </div>
@@ -183,7 +169,72 @@ const heighlightKeywords = (
   })
 }
 
+const VerseListContent = forwardRef<HTMLDivElement>((props, ref) => {
+  return <div ref={ref} {...props} className="p-16pxr" />
+})
+VerseListContent.displayName = 'VerseListContent'
+
+const VerseListFooter = (): JSX.Element => <div className="h-16pxr" />
+
+type VerseListProps = {
+  verses: TBible[]
+  version: string
+  keywords: string[]
+  fetchNextPage
+  hasNextPage: boolean
+  isFetchingNextPage: boolean
+  onLabelClick: KeywordMatchedVersesItemProps['onLabelClick']
+}
+
+const VerseList = forwardRef<VirtuosoHandle, VerseListProps>(
+  (
+    { verses, version, keywords, fetchNextPage, hasNextPage, isFetchingNextPage, onLabelClick },
+    ref
+  ) => {
+    return (
+      <Virtuoso
+        ref={ref}
+        data={verses}
+        endReached={() => {
+          if (hasNextPage && !isFetchingNextPage) {
+            fetchNextPage()
+          }
+        }}
+        itemContent={(_, { book, chapter, verse, btext }) => {
+          return (
+            <>
+              <KeywordMatchedVersesItem
+                version={version}
+                book={book}
+                chapter={chapter}
+                verse={verse}
+                btext={btext}
+                keywords={keywords}
+                isLight={true}
+                onLabelClick={onLabelClick}
+              />
+              {isFetchingNextPage && (
+                <div className="flex justify-center items-center gap-4pxr w-full pt-16pxr">
+                  <p>로딩 중</p>
+                  <Spinner />
+                </div>
+              )}
+            </>
+          )
+        }}
+        components={{
+          List: VerseListContent,
+          Footer: VerseListFooter
+        }}
+        className="overflow-y-scroll"
+      />
+    )
+  }
+)
+VerseList.displayName = 'VerseList'
+
 type KeywordMatchedVersesItemProps = {
+  key?: Key | null | undefined
   version: string
   book: number
   chapter: number
@@ -194,36 +245,35 @@ type KeywordMatchedVersesItemProps = {
   onLabelClick: (version: string, book: number, chapter: number, verse: number) => void
 }
 
-const KeywordMatchedVersesItem = ({
-  version,
-  book,
-  chapter,
-  verse,
-  btext,
-  keywords,
-  isLight,
-  onLabelClick
-}: KeywordMatchedVersesItemProps): JSX.Element => {
-  return (
-    <div data-verse={verse} css={[tw`mb-[0.25rem]`, verse === 1 ? tw`pt-[0.25rem]` : '']}>
-      <div className="flex flex-col">
-        <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault()
-            onLabelClick(version, book, chapter, verse)
-          }}
-          css={[tw`w-fit font-bold`, isLight ? tw`text-brand-blue-500` : tw`text-white`]}
-        >
-          {`${BOOK_INFO.find((el) => el.id === book)?.shortName || ''} ${chapter}:${verse}`}
-        </a>
-        <span className="ml-[1em]">{heighlightKeywords(btext, keywords, isLight)}</span>
+const KeywordMatchedVersesItem = forwardRef<HTMLDivElement, KeywordMatchedVersesItemProps>(
+  ({ version, book, chapter, verse, btext, keywords, isLight, onLabelClick }, ref) => {
+    return (
+      <div
+        ref={ref}
+        data-verse={verse}
+        css={[tw`mb-[0.25rem]`, verse === 1 ? tw`pt-[0.25rem]` : '']}
+      >
+        <div className="flex flex-col">
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault()
+              onLabelClick(version, book, chapter, verse)
+            }}
+            css={[tw`w-fit font-bold`, isLight ? tw`text-brand-blue-500` : tw`text-white`]}
+          >
+            {`${BOOK_INFO.find((el) => el.id === book)?.shortName || ''} ${chapter}:${verse}`}
+          </a>
+          <span className="ml-[1em]">{heighlightKeywords(btext, keywords, isLight)}</span>
+        </div>
       </div>
-    </div>
-  )
-}
+    )
+  }
+)
+KeywordMatchedVersesItem.displayName = 'KeywordMatchedVersesItem'
 
 type FullChaptersWithKeywordItemProps = {
+  key?: Key | null | undefined
   verse: number
   btext: string
   keywords: string[]
