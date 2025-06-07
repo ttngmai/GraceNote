@@ -15,7 +15,12 @@ import { atom } from 'jotai'
 export const panelGridAtom = createPersistentAtom<TPanelGrid>('panelGrid', createInitialPanelGrid())
 export const columnSizesAtom = createPersistentAtom<number[]>('columnSizes', [])
 export const columnSizesResetKeyAtom = atom<string>('columnSizesResetKey')
+export const panelTitleSizeAtom = createPersistentAtom<{ min: number; max: number }>(
+  'panelTitleSize',
+  { min: 4, max: 20 }
+)
 export const panelTextSizeAtom = createPersistentAtom<number>('panelTextSize', 16)
+export const hasAutoScrolledBasePanelAtom = atom<boolean>(false)
 
 export const bookAtom = createPersistentAtom<number>('book', 1)
 export const chapterAtom = createPersistentAtom<number>('chapter', 1)

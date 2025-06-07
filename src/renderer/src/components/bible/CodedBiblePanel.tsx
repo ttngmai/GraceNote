@@ -3,7 +3,8 @@ import {
   bookAtom,
   chapterAtom,
   verseAtom,
-  lexicalCodeAtom
+  lexicalCodeAtom,
+  hasAutoScrolledBasePanelAtom
 } from '@renderer/store'
 import isLight from '@renderer/utils/contrastColor'
 import { BIBLE_COUNT_INFO } from '@shared/constants'
@@ -28,6 +29,7 @@ export default function CodedBiblePanel({
   const verseRefs = useRef<null[] | HTMLElement[]>([]) // 각 절 HTML 요소의 참조 리스트
 
   const panelTextSize = useAtomValue(panelTextSizeAtom)
+  const [hasAutoScrolled, setHasAutoScrolled] = useAtom(hasAutoScrolledBasePanelAtom)
   const book = useAtomValue(bookAtom)
   const chapter = useAtomValue(chapterAtom)
   const [verse, setVerse] = useAtom(verseAtom)
@@ -156,12 +158,17 @@ export default function CodedBiblePanel({
   }, [isBase, bibleData, visibleVerseList])
 
   useEffect(() => {
-    if (!isBase && bibleData && bibleData.length > 0) {
+    if (bibleData && bibleData.length > 0) {
       const currentVerseRef = verseRefs.current
         .filter((el) => el instanceof HTMLElement)
         .find((el) => Number(el?.dataset?.verse) === verse)
 
-      if (currentVerseRef) {
+      if (isBase && !hasAutoScrolled && currentVerseRef) {
+        currentVerseRef.scrollIntoView(true)
+        setHasAutoScrolled(true)
+      }
+
+      if (!isBase && currentVerseRef) {
         currentVerseRef.scrollIntoView(true)
       }
     }

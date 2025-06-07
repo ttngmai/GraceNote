@@ -9,6 +9,7 @@ import PanelStylesModal from './PanelStylesModal'
 import { panelGridAtom } from '@renderer/store'
 import { mergePanels, unmergePanel } from '@renderer/utils/panelUtils'
 import { PANEL_ROWS } from '@shared/constants'
+import PanelTitleSizeModal from './PanelTitleSizeModal'
 
 type PanelSettingsDropdownProps = {
   panelId: string
@@ -23,6 +24,7 @@ export default function PanelSettingsDropdown({
   const panel = panelGrid.panels.find((p) => p.id === panelId)
   const settings = panelGrid.settings[panelId]
 
+  const [openPanelTitleSizeModal, setOpenPanelTitleSizeModal] = useState<boolean>(false)
   const [openStylesModal, setOpenStylesModal] = useState<boolean>(false)
 
   const toggleBasePanel = (id: string): void => {
@@ -88,6 +90,14 @@ export default function PanelSettingsDropdown({
             </DropdownMenu.Item>
             <DropdownMenu.Item
               onSelect={() => {
+                setOpenPanelTitleSizeModal(true)
+              }}
+              css={dropdownMenuItemStyle}
+            >
+              제목 크기 (공통)
+            </DropdownMenu.Item>
+            <DropdownMenu.Item
+              onSelect={() => {
                 setOpenStylesModal(true)
               }}
               css={dropdownMenuItemStyle}
@@ -121,6 +131,11 @@ export default function PanelSettingsDropdown({
       {openStylesModal && (
         <ModalPortal>
           <PanelStylesModal panelId={panelId} onClose={() => setOpenStylesModal(false)} />
+        </ModalPortal>
+      )}
+      {openPanelTitleSizeModal && (
+        <ModalPortal>
+          <PanelTitleSizeModal onClose={() => setOpenPanelTitleSizeModal(false)} />
         </ModalPortal>
       )}
     </>

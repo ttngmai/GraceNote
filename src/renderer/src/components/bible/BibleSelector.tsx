@@ -1,23 +1,69 @@
 import { BIBLE_COUNT_INFO, BOOK_INFO } from '@shared/constants'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useAtomValue } from 'jotai'
-import { bookAtom, chapterAtom } from '@renderer/store'
+import { bookAtom, chapterAtom, verseAtom } from '@renderer/store'
 import useSearchBible from '@renderer/hooks/useSearchBible'
 import { IconArrowLeft, IconArrowRight } from '@tabler/icons-react'
-import CustomSelect from '../common/CustomSelect'
 import * as Popover from '@radix-ui/react-popover'
 import Button from '../common/Button'
+import tw from 'twin.macro'
+
+type TSelectedBible = {
+  book: number | null
+  chapter: number | null
+  verse: number | null
+}
 
 export default function BibleSelector(): JSX.Element {
+  const bookListRef = useRef<HTMLUListElement>(null)
+  const chapterListRef = useRef<HTMLUListElement>(null)
+  const verseListRef = useRef<HTMLUListElement>(null)
+
   const book = useAtomValue(bookAtom)
   const chapter = useAtomValue(chapterAtom)
+  const verse = useAtomValue(verseAtom)
 
   const [lastChapter, setLastChapter] = useState<number>(0)
+  const [lastVerse, setLastVerse] = useState<number>(0)
   const [openBookSelector, setOpenBookSelector] = useState(false)
+  const [selectedBible, setSelectedBible] = useState<TSelectedBible>({ book, chapter, verse })
 
-  const bookName = BOOK_INFO.find((el) => el.id === book)?.name
+  const bookShortName = BOOK_INFO.find((el) => el.id === book)?.shortName
 
   const searchBible = useSearchBible()
+
+  const scrollToSelected = (): void => {
+    if (selectedBible.book && bookListRef.current) {
+      const target = bookListRef.current.querySelector<HTMLLIElement>(
+        `li[data-book-id="${selectedBible.book}"]`
+      )
+      target?.scrollIntoView({ block: 'start' })
+    }
+
+    if (selectedBible.chapter && chapterListRef.current) {
+      const target = chapterListRef.current.querySelector<HTMLLIElement>(
+        `li[data-chapter="${selectedBible.chapter}"]`
+      )
+      target?.scrollIntoView({ block: 'start' })
+    }
+
+    if (selectedBible.verse && verseListRef.current) {
+      const target = verseListRef.current.querySelector<HTMLLIElement>(
+        `li[data-verse="${selectedBible.verse}"]`
+      )
+      target?.scrollIntoView({ block: 'start' })
+    }
+  }
+
+  const scrollToBook = (targetBookId: number): void => {
+    const container = bookListRef.current
+    if (!container) return
+
+    const target = container.querySelector<HTMLLIElement>(`li[data-book-id="${targetBookId}"]`)
+    if (target) {
+      target.scrollIntoView({ behavior: 'auto', block: 'start' })
+    }
+  }
 
   useEffect(() => {
     setLastChapter(
@@ -27,11 +73,37 @@ export default function BibleSelector(): JSX.Element {
     )
   }, [book])
 
+  useEffect(() => {
+    if (!selectedBible.book || !selectedBible.chapter) {
+      setLastVerse(0)
+      return
+    }
+
+    setLastVerse(
+      BIBLE_COUNT_INFO.filter(
+        (el) => el.book === selectedBible.book && el.chapter === selectedBible.chapter
+      )[0].lastVerse || 0
+    )
+  }, [selectedBible.book, selectedBible.chapter])
+
+  useEffect(() => {
+    if (!openBookSelector) return
+
+    setSelectedBible({ book, chapter, verse })
+
+    setTimeout(() => {
+      scrollToSelected()
+    }, 0)
+  }, [openBookSelector])
+
   return (
     <div className="flex items-center gap-8pxr mx-auto">
       <Popover.Root open={openBookSelector} onOpenChange={setOpenBookSelector}>
         <Popover.Trigger>
-          <span className="font-bold text-brand-blue-500">{bookName}</span>
+          <div className="flex justify-center gap-8pxr w-80pxr font-bold text-brand-blue-500">
+            <span>{bookShortName}</span>
+            <span>{`${chapter}:${verse}`}</span>
+          </div>
         </Popover.Trigger>
         <Popover.Portal>
           <Popover.Content
@@ -41,37 +113,91 @@ export default function BibleSelector(): JSX.Element {
               height: 'calc(var(--radix-popover-content-available-height) - 16px)'
             }}
           >
-            <div className="flex flex-col w-300pxr">
-              <div className="flex items-center h-32pxr px-8pxr py-4pxr border-b border-b-gray-300 font-bold text-[14px]">
-                <p className="flex-1">구약</p>
-                <p className="flex-1">신약</p>
+            <div className="flex flex-col w-360pxr">
+              <div className="flex items-center h-32pxr py-4pxr border-b border-b-gray-300 font-bold text-[14px]">
+                <div className="flex items-center w-120pxr h-full">
+                  <Button
+                    type="button"
+                    onClick={() => scrollToBook(1)}
+                    variant="ghost"
+                    sx={tw`flex-1 h-full`}
+                  >
+                    구약
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => scrollToBook(40)}
+                    variant="ghost"
+                    sx={tw`flex-1 h-full`}
+                  >
+                    신약
+                  </Button>
+                </div>
+                <div className="w-120pxr h-full border-x text-center">장</div>
+                <div className="w-120pxr h-full text-center">절</div>
               </div>
               <div className="flex h-[calc(100%-32px)]">
-                <ul className="flex-1 overflow-y-auto scroll-hidden">
-                  {BOOK_INFO.slice(0, 39).map((el) => (
+                <ul ref={bookListRef} className="w-120pxr overflow-y-auto scroll-hidden">
+                  {BOOK_INFO.map((el) => (
                     <li
                       key={el.id}
+                      data-book-id={el.id}
                       onClick={() => {
-                        searchBible(el.id, 1, 1)
-                        setOpenBookSelector(false)
+                        setSelectedBible({ book: el.id, chapter: null, verse: null })
                       }}
-                      className="flex items-center gap-4pxr h-32pxr px-8pxr py-4pxr text-[14px] select-none cursor-pointer hover:font-bold hover:bg-[#F8FAFC]"
+                      css={[
+                        tw`flex items-center gap-4pxr h-32pxr px-8pxr py-4pxr text-[14px] select-none cursor-pointer hover:font-bold`,
+                        el.id === selectedBible.book
+                          ? tw`bg-brand-blue-50 font-bold`
+                          : tw`hover:bg-[#F8FAFC]`
+                      ]}
                     >
                       <span>{el.name}</span>
                     </li>
                   ))}
                 </ul>
-                <ul className="flex-1 overflow-y-auto scroll-hidden">
-                  {BOOK_INFO.slice(39).map((el) => (
+                <ul
+                  ref={chapterListRef}
+                  className="w-120pxr overflow-y-auto scroll-hidden border-x"
+                >
+                  {BIBLE_COUNT_INFO.filter((el) => el.book === selectedBible.book).map((el) => (
                     <li
-                      key={el.id}
+                      key={el.chapter}
+                      data-chapter={el.chapter}
                       onClick={() => {
-                        searchBible(el.id, 1, 1)
-                        setOpenBookSelector(false)
+                        setSelectedBible({ ...selectedBible, chapter: el.chapter, verse: null })
                       }}
-                      className="flex items-center gap-4pxr h-32pxr px-8pxr py-4pxr text-[14px] select-none cursor-pointer hover:font-bold hover:bg-[#F8FAFC]"
+                      css={[
+                        tw`flex items-center gap-4pxr h-32pxr px-8pxr py-4pxr text-[14px] select-none cursor-pointer hover:font-bold`,
+                        el.chapter === selectedBible.chapter
+                          ? tw`bg-brand-blue-50 font-bold`
+                          : tw`hover:bg-[#F8FAFC]`
+                      ]}
                     >
-                      <span>{el.name}</span>
+                      {`${el.chapter}${el.book !== 19 ? '장' : '편'}`}
+                    </li>
+                  ))}
+                </ul>
+                <ul ref={verseListRef} className="w-120pxr overflow-y-auto scroll-hidden">
+                  {Array.from({ length: lastVerse }).map((_, index) => (
+                    <li
+                      key={index + 1}
+                      data-verse={index + 1}
+                      onClick={() => {
+                        if (selectedBible.book && selectedBible.chapter) {
+                          setSelectedBible({ ...selectedBible, verse: index + 1 })
+                          searchBible(selectedBible.book, selectedBible.chapter, index + 1)
+                          setOpenBookSelector(false)
+                        }
+                      }}
+                      css={[
+                        tw`flex items-center gap-4pxr h-32pxr px-8pxr py-4pxr text-[14px] select-none cursor-pointer hover:font-bold`,
+                        index + 1 === selectedBible.verse
+                          ? tw`bg-brand-blue-50 font-bold`
+                          : tw`hover:bg-[#F8FAFC]`
+                      ]}
+                    >
+                      {`${index + 1}절`}
                     </li>
                   ))}
                 </ul>
@@ -81,7 +207,8 @@ export default function BibleSelector(): JSX.Element {
           </Popover.Content>
         </Popover.Portal>
       </Popover.Root>
-      <div className="flex items-center">
+
+      <div className="flex items-center gap-8pxr">
         <Button
           type="button"
           onClick={() => searchBible(book, chapter - 1, 1)}
@@ -90,27 +217,6 @@ export default function BibleSelector(): JSX.Element {
         >
           <IconArrowLeft size={18} />
         </Button>
-        <CustomSelect
-          itemList={BIBLE_COUNT_INFO.filter((el) => el.book === book).map((el) => ({
-            key: String(el.chapter),
-            value: String(el.chapter),
-            text: `${el.chapter}${el.book !== 19 ? '장' : '편'}`
-          }))}
-          value={String(chapter)}
-          setValue={(value) => searchBible(book, Number(value), 1)}
-        >
-          <div className="flex justify-center items-center mx-8pxr font-bold">
-            <span className="text-brand-blue-500">
-              {chapter}
-              {book !== 19 ? '장' : '편'}
-            </span>
-            <span className="mx-8pxr">/</span>
-            <span>
-              {lastChapter}
-              {book !== 19 ? '장' : '편'}
-            </span>
-          </div>
-        </CustomSelect>
         <Button
           type="button"
           onClick={() => searchBible(book, chapter + 1, 1)}
