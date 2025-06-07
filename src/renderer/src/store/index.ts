@@ -13,6 +13,8 @@ import {
 import { atom } from 'jotai'
 
 export const panelGridAtom = createPersistentAtom<TPanelGrid>('panelGrid', createInitialPanelGrid())
+export const columnSizesAtom = createPersistentAtom<number[]>('columnSizes', [])
+export const columnSizesResetKeyAtom = atom<string>('columnSizesResetKey')
 export const panelTextSizeAtom = createPersistentAtom<number>('panelTextSize', 16)
 
 export const bookAtom = createPersistentAtom<number>('book', 1)

@@ -2,39 +2,47 @@ import { PanelCategory, TPanelLayout, TPanelSettings } from '@shared/types'
 import PanelCategorySelector from './PanelCategorySelector'
 import Button from './Button'
 import { IconGripVertical } from '@tabler/icons-react'
-import tw, { css } from 'twin.macro'
+import tw from 'twin.macro'
 import BiblePanel from '../bible/BiblePanel'
 import CodedBiblePanel from '../bible/CodedBiblePanel'
 import LexiconPanel from '../lexicon/LexiconPanel'
 import PanelSettingsDropdown from './PanelSettingsDropdown'
 import { useSortable } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
 import CommentaryPanel from '../commentary/CommentaryPanel'
 
 type PanelProps = {
   key?: string
   layout: TPanelLayout
   setting: TPanelSettings
+  isOverlay?: boolean
+  isDragging?: boolean
+  isOver?: boolean
 }
 
-const Panel: React.FC<PanelProps> = ({ layout, setting }: PanelProps) => {
+const Panel: React.FC<PanelProps> = ({
+  layout,
+  setting,
+  isOverlay = false,
+  isDragging = false,
+  isOver = false
+}: PanelProps) => {
   if (layout.state === 'hidden') return null
 
-  const { id, row, col, mergeRange, state } = layout
+  const { id } = layout
   const { isBase, category, version, backgroundColor, textColor } = setting
-  const isMaster = state === 'master' && mergeRange
 
-  const visibleStartRow = isMaster ? mergeRange.startRow + 1 : row + 1
-  const visibleEndRow = isMaster ? mergeRange.endRow + 1 : 0
-  const visibleStartCol = isMaster ? mergeRange.startCol + 1 : col + 1
-  const visibleEndCol = isMaster ? mergeRange.endCol + 1 : 0
-
-  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform } = useSortable({
-    id: layout.id
-  })
+  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform } = isOverlay
+    ? {
+        attributes: {},
+        listeners: {},
+        setNodeRef: undefined,
+        setActivatorNodeRef: undefined,
+        transform: null
+      }
+    : useSortable({ id })
 
   const style: React.CSSProperties = {
-    transform: CSS.Transform.toString(transform)
+    zIndex: transform ? 9999 : 'auto'
   }
 
   const renderPanel = (): JSX.Element => {
@@ -74,24 +82,25 @@ const Panel: React.FC<PanelProps> = ({ layout, setting }: PanelProps) => {
     }
   }
 
+  if (isDragging) {
+    return (
+      <div
+        ref={setNodeRef}
+        css={[
+          tw`flex flex-col h-full border rounded bg-gray-200 shadow`,
+          isOver ? tw`border-brand-blue-500` : undefined
+        ]}
+        style={style}
+      ></div>
+    )
+  }
+
   return (
     <div
-      ref={setNodeRef}
+      ref={!isOverlay ? setNodeRef : undefined}
       css={[
         tw`flex flex-col h-full border rounded shadow`,
-        css`
-          ${isMaster
-            ? `
-              grid-row-start: ${visibleStartRow};
-              grid-row-end: ${visibleEndRow + 1};
-              grid-column-start: ${visibleStartCol};
-              grid-column-end: ${visibleEndCol + 1};
-            `
-            : `
-              grid-row-start: ${visibleStartRow};
-              grid-column-start: ${visibleStartCol};
-          `}
-        `
+        isOver ? tw`border-brand-blue-500` : undefined
       ]}
       style={style}
     >
@@ -105,7 +114,7 @@ const Panel: React.FC<PanelProps> = ({ layout, setting }: PanelProps) => {
         />
 
         <Button
-          ref={setActivatorNodeRef}
+          ref={!isOverlay ? setActivatorNodeRef : undefined}
           {...attributes}
           {...listeners}
           type="button"

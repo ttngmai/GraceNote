@@ -1,5 +1,5 @@
 import Button from '../common/Button'
-import { IconMusic } from '@tabler/icons-react'
+import { IconMusic, IconRulerMeasure } from '@tabler/icons-react'
 import PanelTextSizeSelector from '../common/PanelTextSizeSelector'
 import * as Separator from '@radix-ui/react-separator'
 import SimpleLexicalCodeSearch from '../lexicon/SimpleLexicalCodeSearch'
@@ -9,8 +9,11 @@ import PanelVisibilityControls from '../common/PanelVisibilityControls'
 import tw from 'twin.macro'
 import BibleVerseSearch from '@public/icon/BibleVerseSearch.svg?react'
 import LexicalCodeSearch from '@public/icon/LexicalCodeSearch.svg?react'
+import useResetColumnSizes from '@renderer/hooks/useResetColumnSizes'
 
 export default function MainPageNavigationBar(): JSX.Element {
+  const resetColumnSizes = useResetColumnSizes()
+
   return (
     <NavigationBar sx={tw`h-80pxr`}>
       <div className="flex items-center shrink-0 w-fit">
@@ -67,6 +70,12 @@ export default function MainPageNavigationBar(): JSX.Element {
         decorative
         orientation="vertical"
       />
+
+      <div className="flex items-center shrink-0 w-fit mr-8pxr">
+        <Button type="button" onClick={() => resetColumnSizes()} size="icon">
+          <IconRulerMeasure size={18} />
+        </Button>
+      </div>
 
       <div className="flex items-center shrink-0 w-fit ml-auto">
         <SimpleLexicalCodeSearch />
