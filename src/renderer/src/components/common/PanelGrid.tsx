@@ -30,12 +30,10 @@ export default function PanelGrid(): JSX.Element {
   const [overId, setOverId] = useState<string | null>(null)
 
   const handleDragStart = (event: DragStartEvent): void => {
-    console.log('drag:', event.active)
     setActiveId(String(event.active.id))
   }
 
   const handleDragOver = ({ over }): void => {
-    console.log('over:', over)
     setOverId(over?.id ?? null)
   }
 
