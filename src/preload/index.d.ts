@@ -5,7 +5,8 @@ import {
   TFindHymn,
   TFindLexicon,
   TFindCommentary,
-  TFindKeywordFromBible
+  TFindKeywordFromBible,
+  TFindKeywordFromHymn
 } from '@shared/types'
 
 declare global {
@@ -25,9 +26,10 @@ declare global {
       findBible: TFindBible
       findCommentary: TFindCommentary
       findLexicon: TFindLexicon
+      findHymn: TFindHymn
       findKeywordFromBible: TFindKeywordFromBible
       findLexicalCodeFromBible: TFindLexicalCodeFromBible
-      findHymn: TFindHymn
+      findKeywordFromHymn: TFindKeywordFromHymn
       getAudioFilePath: (fileName: string) => string
       getImageFilePath: (fileName: string) => string
       openBibleVerseWindow: () => void

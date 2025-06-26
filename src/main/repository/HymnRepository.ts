@@ -1,36 +1,80 @@
-import { TFindHymn, TFindHymnParams } from '@shared/types.js'
+import { TFindHymn, TFindKeywordFromHymn } from '@shared/types.js'
 import { getHymnDB } from './getDB.js'
 import { THymn } from '@shared/models.js'
 
-export const findHymn: TFindHymn = async (params: TFindHymnParams) => {
+export const findHymn: TFindHymn = async (hymnNumber: string) => {
   try {
     const db = getHymnDB('찬송가')
 
-    const whereClauses: string[] = []
-    const values: any[] = []
-
-    if (params.hymn_number) {
-      whereClauses.push('hymn_number = ?')
-      values.push(params.hymn_number)
-    }
-    if (params.title) {
-      whereClauses.push('title LIKE ?')
-      values.push(`%${params.title}%`)
-    }
-    if (params.lyrics) {
-      whereClauses.push('lyrics LIKE ?')
-      values.push(`%${params.lyrics}%`)
-    }
-
-    const whereQuery = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : ''
-    const query = `SELECT id, hymn_number, title, lyrics FROM Hymn ${whereQuery}`
+    const query = `SELECT * FROM Hymn WHERE hymn_number = ${hymnNumber}`
     const readQuery = db.prepare(query)
-
-    const rowList = readQuery.all(values) as THymn[]
+    const rowList = readQuery.all() as THymn[]
 
     return Promise.resolve(rowList)
   } catch (err) {
     console.error(err)
     return Promise.resolve([])
+  }
+}
+
+export const findKeywordFromHymn: TFindKeywordFromHymn = async ({
+  searchTarget,
+  keywords,
+  matchType,
+  page = 1,
+  pageSize = 500
+}) => {
+  try {
+    const db = getHymnDB('찬송가')
+
+    if (!keywords || keywords.length === 0) {
+      throw new Error('Invalid keywords')
+    }
+
+    let targetColumn = ''
+    switch (searchTarget) {
+      case 'title':
+        targetColumn = 'title'
+        break
+      case 'lyrics':
+        targetColumn = 'lyrics'
+        break
+      default:
+        throw new Error('Invalid searchTarget')
+    }
+
+    const conditions = keywords
+      .filter((keyword) => keyword.trim() !== '')
+      .map((keyword) => `${targetColumn} LIKE '%${keyword}%'`)
+
+    const whereSQL = matchType === 'any' ? conditions.join(' OR ') : conditions.join(' AND ')
+
+    // 전체 개수 조회
+    const countRow = db.prepare(`SELECT COUNT(*) as count FROM Hymn WHERE ${whereSQL}`).get() as {
+      count: number | string
+    }
+    const totalCount = Number(countRow.count)
+    const totalPages = Math.ceil(totalCount / pageSize)
+
+    // 데이터 조회
+    const offset = (page - 1) * pageSize
+    const data = db
+      .prepare(`SELECT * FROM Hymn WHERE ${whereSQL} LIMIT ${pageSize} OFFSET ${offset}`)
+      .all() as THymn[]
+
+    return {
+      data,
+      totalCount,
+      currentPage: page,
+      totalPages
+    }
+  } catch (err) {
+    console.log(err)
+    return {
+      data: [],
+      totalCount: 0,
+      currentPage: page,
+      totalPages: 0
+    }
   }
 }

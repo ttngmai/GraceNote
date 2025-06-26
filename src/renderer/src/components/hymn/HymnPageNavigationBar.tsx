@@ -1,16 +1,19 @@
 import { useEffect, useState } from 'react'
 import NavigationBar from '../common/NavigationBar'
 import HymnPlayer from './HymnPlayer'
-import * as Separator from '@radix-ui/react-separator'
-import HymnSearch from './HymnSearch'
+import HymnNumberSearch from './HymnNumberSearch'
 import { useAtomValue } from 'jotai'
-import { hymnAtom, hymnDisplayModeAtom } from '@renderer/store'
-import HymnDisplayModeToggleButton from './HymnDisplayModeToggleButton'
+import { hymnAtom, scoreViewModeAtom } from '@renderer/store'
+import * as Separator from '@radix-ui/react-separator'
+
 import HymnTextSizeSelector from './HymnTextSizeSelector'
+import tw from 'twin.macro'
+import HymnKeywordSearch from './HymnKeywordSearch'
+import ScoreViewModeToggleButton from './ScoreViewModeToggleButton'
 
 export default function HymnPageNavigation(): JSX.Element {
   const hymn = useAtomValue(hymnAtom)
-  const hymnDisplayMode = useAtomValue(hymnDisplayModeAtom)
+  const scoreViewMode = useAtomValue(scoreViewModeAtom)
 
   const [hymnAudioPath, setHymnAudioPath] = useState<string>('')
 
@@ -26,28 +29,30 @@ export default function HymnPageNavigation(): JSX.Element {
   }, [hymn])
 
   return (
-    <NavigationBar>
-      <div className="flex items-center shrink-0 w-250pxr h-40pxr mt-8pxr">
-        <HymnPlayer url={hymnAudioPath} playbackRate={1.0} />
-      </div>
+    <NavigationBar sx={tw`h-110pxr`}>
+      <div className="flex flex-col gap-8pxr h-full">
+        <div className="flex items-center">
+          <HymnNumberSearch />
 
-      <Separator.Root
-        className="shrink-0 inline-block data-[orientation=vertical]:h-full data-[orientation=vertical]:w-px mx-12pxr bg-gray-300"
-        decorative
-        orientation="vertical"
-      />
+          <Separator.Root
+            className="shrink-0 inline-block data-[orientation=vertical]:h-full data-[orientation=vertical]:w-px mx-12pxr bg-gray-300"
+            decorative
+            orientation="vertical"
+          />
 
-      <HymnSearch />
+          <div className="flex items-center shrink-0 w-250pxr h-40pxr mt-8pxr">
+            <HymnPlayer url={hymnAudioPath} playbackRate={1.0} />
+          </div>
 
-      <Separator.Root
-        className="shrink-0 inline-block data-[orientation=vertical]:h-full data-[orientation=vertical]:w-px mx-12pxr bg-gray-300"
-        decorative
-        orientation="vertical"
-      />
+          <div className="flex items-center shrink-0 gap-8pxr w-fit ml-16pxr">
+            <ScoreViewModeToggleButton />
+            {scoreViewMode === 'textMode' && <HymnTextSizeSelector />}
+          </div>
+        </div>
 
-      <div className="flex items-center shrink-0 gap-8pxr w-fit">
-        <HymnDisplayModeToggleButton />
-        {hymnDisplayMode === 'lyricsMode' && <HymnTextSizeSelector />}
+        <div className="flex">
+          <HymnKeywordSearch />
+        </div>
       </div>
     </NavigationBar>
   )

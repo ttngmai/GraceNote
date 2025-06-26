@@ -1,5 +1,4 @@
 import Button from '../common/Button'
-import { IconMusic, IconRulerMeasure } from '@tabler/icons-react'
 import PanelTextSizeSelector from '../common/PanelTextSizeSelector'
 import * as Separator from '@radix-ui/react-separator'
 import SimpleLexicalCodeSearch from '../lexicon/SimpleLexicalCodeSearch'
@@ -7,13 +6,12 @@ import NavigationBar from '../common/NavigationBar'
 import BibleSelector from '../bible/BibleSelector'
 import PanelVisibilityControls from '../common/PanelVisibilityControls'
 import tw from 'twin.macro'
-import BibleVerseSearch from '@public/icon/BibleVerseSearch.svg?react'
-import LexicalCodeSearch from '@public/icon/LexicalCodeSearch.svg?react'
-import useResetColumnSizes from '@renderer/hooks/useResetColumnSizes'
+import BibleVerseSearchIcon from '@public/icon/BibleVerseSearchIcon.svg?react'
+import LexicalCodeSearchIcon from '@public/icon/LexicalCodeSearchIcon.svg?react'
+import HymnSearchIcon from '@public/icon/HymnSearchIcon.svg?react'
+import ColumnSettings from '../common/ColumnSettings'
 
 export default function MainPageNavigationBar(): JSX.Element {
-  const resetColumnSizes = useResetColumnSizes()
-
   return (
     <NavigationBar sx={tw`h-80pxr`}>
       <div className="flex items-center shrink-0 w-fit">
@@ -34,7 +32,7 @@ export default function MainPageNavigationBar(): JSX.Element {
           }}
           size="icon"
         >
-          <BibleVerseSearch className="w-5 h-5" />
+          <BibleVerseSearchIcon className="w-5 h-5" />
         </Button>
         <Button
           type="button"
@@ -43,7 +41,7 @@ export default function MainPageNavigationBar(): JSX.Element {
           }}
           size="icon"
         >
-          <LexicalCodeSearch className="w-5 h-5" />
+          <LexicalCodeSearchIcon className="w-5 h-5" />
         </Button>
         <Button
           type="button"
@@ -52,7 +50,7 @@ export default function MainPageNavigationBar(): JSX.Element {
           }}
           size="icon"
         >
-          <IconMusic size={18} />
+          <HymnSearchIcon className="w-5 h-5" />
         </Button>
         <PanelTextSizeSelector />
       </div>
@@ -72,9 +70,7 @@ export default function MainPageNavigationBar(): JSX.Element {
       />
 
       <div className="flex items-center shrink-0 w-fit mr-8pxr">
-        <Button type="button" onClick={() => resetColumnSizes()} size="icon">
-          <IconRulerMeasure size={18} />
-        </Button>
+        <ColumnSettings />
       </div>
 
       <div className="flex items-center shrink-0 w-fit ml-auto">

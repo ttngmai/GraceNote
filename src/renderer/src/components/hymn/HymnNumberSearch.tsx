@@ -1,19 +1,21 @@
 import * as Label from '@radix-ui/react-label'
-import { hymnAtom } from '@renderer/store'
+import { hymnAtom, hymnPageViewModeAtom } from '@renderer/store'
 import { useSetAtom } from 'jotai'
 import Button from '../common/Button'
 import { IconSearch } from '@tabler/icons-react'
 import { useState } from 'react'
 
-export default function HymnSearch(): JSX.Element {
+export default function HymnNumberSearch(): JSX.Element {
   const setHymn = useSetAtom(hymnAtom)
+  const setHymnPageViewModeAtom = useSetAtom(hymnPageViewModeAtom)
 
   const [keyword, setKeyword] = useState<string>('')
 
   const handleSearchHymn = async (): Promise<void> => {
-    const result = await window.context.findHymn({ hymn_number: keyword.trim() })
+    const result = await window.context.findHymn(keyword.trim())
     if (result && result.length > 0) {
       setHymn(result[0])
+      setHymnPageViewModeAtom('score')
     }
   }
 

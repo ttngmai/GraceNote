@@ -54,8 +54,8 @@ export default function BibleRangeSelector({
           variant="outline"
           sx={
             start === 1 && end === 66
-              ? tw`w-40pxr rounded-r-none border-r-0 font-bold text-brand-blue-500`
-              : tw`w-40pxr rounded-r-none border-r-0`
+              ? tw`w-40pxr rounded-r-none border-r-0 bg-amber-100 hover:bg-amber-200 font-bold text-brand-blue-500`
+              : tw`w-40pxr rounded-r-none border-r-0 bg-amber-100 hover:bg-amber-200`
           }
         >
           전체
@@ -69,8 +69,8 @@ export default function BibleRangeSelector({
           variant="outline"
           sx={
             start === 1 && end === 39
-              ? tw`w-40pxr rounded-none font-bold text-brand-blue-500`
-              : tw`w-40pxr rounded-none`
+              ? tw`w-40pxr rounded-none bg-green-100 hover:bg-green-200 font-bold text-brand-blue-500`
+              : tw`w-40pxr rounded-none bg-green-100 hover:bg-green-200`
           }
         >
           구약
@@ -84,8 +84,8 @@ export default function BibleRangeSelector({
           variant="outline"
           sx={
             start === 40 && end === 66
-              ? tw`w-40pxr rounded-l-none border-l-0 font-bold text-brand-blue-500`
-              : tw`w-40pxr rounded-l-none border-l-0`
+              ? tw`w-40pxr rounded-l-none border-l-0 bg-red-100 hover:bg-red-200 font-bold text-brand-blue-500`
+              : tw`w-40pxr rounded-l-none border-l-0 bg-red-100 hover:bg-red-200`
           }
         >
           신약
@@ -136,7 +136,7 @@ export default function BibleRangeSelector({
                       className="flex items-center gap-4pxr h-32pxr px-8pxr py-4pxr text-[14px] select-none cursor-pointer"
                       css={[
                         (start && end && start <= el.id && el.id <= end) || start === el.id
-                          ? tw`bg-brand-blue-50 font-bold`
+                          ? tw`bg-indigo-200 font-bold`
                           : tw`hover:bg-[#F8FAFC]`
                       ]}
                     >
@@ -154,7 +154,7 @@ export default function BibleRangeSelector({
                       className="flex items-center gap-4pxr h-32pxr px-8pxr py-4pxr text-[14px] select-none cursor-pointer"
                       css={[
                         (start && end && start <= el.id && el.id <= end) || start === el.id
-                          ? tw`bg-brand-blue-50 font-bold`
+                          ? tw`bg-indigo-200 font-bold`
                           : tw`hover:bg-[#F8FAFC]`
                       ]}
                     >

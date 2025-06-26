@@ -5,7 +5,6 @@ import { TwStyle } from 'twin.macro'
 import { useAtom, useAtomValue } from 'jotai'
 import { PANEL_CATEGORIES_AND_VERSIONS } from '@shared/constants'
 import { panelGridAtom, panelTitleSizeAtom } from '@renderer/store'
-import { Textfit } from 'react-textfit'
 
 type PanelCategorySelectorProps = {
   panelId: string
@@ -39,10 +38,8 @@ export default function PanelCategorySelector({
 
   return (
     <DropdownMenu.Root>
-      <DropdownMenu.Trigger css={[sx]}>
-        <Textfit mode="single" min={panelTitleSize.min} max={panelTitleSize.max}>
-          {placeholder || '없음'}
-        </Textfit>
+      <DropdownMenu.Trigger css={[sx]} style={{ fontSize: `${panelTitleSize}px` }}>
+        {placeholder || '없음'}
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Portal>

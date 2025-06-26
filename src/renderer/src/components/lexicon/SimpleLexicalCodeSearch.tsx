@@ -1,18 +1,18 @@
 import Button from '../common/Button'
 import { IconChevronLeft, IconChevronRight, IconSearch } from '@tabler/icons-react'
-import { lexicalCodeAtom, lexicalCodeSearchConditionAtom } from '@renderer/store'
+import { lexicalCodeAtom, lexicalCodeSearchParamsAtom } from '@renderer/store'
 import { useAtom } from 'jotai'
 import { useEffect, useState } from 'react'
 import * as Label from '@radix-ui/react-label'
 
 export default function SimpleLexicalCodeSearch(): JSX.Element {
   const [lexicalCode, setLexicalCode] = useAtom(lexicalCodeAtom)
-  const [searchCondition, setSearchCondition] = useAtom(lexicalCodeSearchConditionAtom)
+  const [searchParams, setSearchParams] = useAtom(lexicalCodeSearchParamsAtom)
 
   const [keyword, setKeyword] = useState<string>(lexicalCode)
 
   const openInLexiconPage = (keyword: string): void => {
-    setSearchCondition({ ...searchCondition, codes: [keyword] })
+    setSearchParams({ ...searchParams, codes: [keyword] })
     window.context.openLexiconWindow(keyword)
   }
 
@@ -45,7 +45,7 @@ export default function SimpleLexicalCodeSearch(): JSX.Element {
   return (
     <div className="flex items-center shrink-0 w-fit gap-8pxr">
       <Label.Root className="flex gap-4pxr font-bold" htmlFor="lexical-code">
-        <span style={{ fontFamily: 'Noto Serif Hebrew' }}>א</span>
+        <span style={{ fontFamily: 'Noto Serif Hebrew', fontSize: '17px' }}>א</span>
         <span style={{ fontFamily: 'Noto Serif' }}>Ω</span>
       </Label.Root>
       <input

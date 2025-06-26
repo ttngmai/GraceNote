@@ -1,11 +1,11 @@
-import { lexicalCodeSearchConditionAtom, lexicalCodeSearchResultAtom } from '@renderer/store'
+import { lexicalCodeSearchParamsAtom, lexicalCodeSearchResultAtom } from '@renderer/store'
 import { useAtom, useSetAtom } from 'jotai'
 import { useEffect, useRef, useState } from 'react'
 import Button from '../common/Button'
 import { IconSearch } from '@tabler/icons-react'
 import CustomSelect from '../common/CustomSelect'
 import { PANEL_CATEGORIES_AND_VERSIONS } from '@shared/constants'
-import { LexicalCodeSearchCondition, PanelCategory } from '@shared/types'
+import { FindLexicalCodeFromBibleParams, PanelCategory } from '@shared/types'
 import BibleRangeSelector from '../bible/BibleRangeSelector'
 
 const FIXED_INPUT_COUNT = 3
@@ -13,20 +13,22 @@ const FIXED_INPUT_COUNT = 3
 export default function LexicalCodeSearch(): JSX.Element {
   const firstInputRef = useRef<HTMLInputElement>(null)
 
-  const [searchCondition, setSearchCondition] = useAtom(lexicalCodeSearchConditionAtom)
+  const [searchParams, setSearchParams] = useAtom(lexicalCodeSearchParamsAtom)
   const setLexicalCodeSearchResult = useSetAtom(lexicalCodeSearchResultAtom)
-  const { codes } = searchCondition
+  const { codes } = searchParams
 
-  const [tempSearchCondition, setTempSearchCondition] = useState({ ...searchCondition })
+  const [tempSearchParams, setTempSearchParams] = useState({ ...searchParams })
 
   const handleCodeChange = (index: number, value: string): void => {
-    const updatedCodes = [...tempSearchCondition.codes]
+    const updatedCodes = [...tempSearchParams.codes]
     updatedCodes[index] = value.trim().toUpperCase()
-    setTempSearchCondition({ ...tempSearchCondition, codes: updatedCodes })
+    setTempSearchParams({ ...tempSearchParams, codes: updatedCodes })
   }
 
-  const handleSearchLexicalCode = async (condition: LexicalCodeSearchCondition): Promise<void> => {
-    setSearchCondition(condition)
+  const handleSearchLexicalCode = async (
+    condition: FindLexicalCodeFromBibleParams
+  ): Promise<void> => {
+    setSearchParams(condition)
     const result = await window.context.findLexicalCodeFromBible(condition)
     if (result) {
       setLexicalCodeSearchResult(result)
@@ -35,13 +37,13 @@ export default function LexicalCodeSearch(): JSX.Element {
 
   const handleEnterKey = (e: React.KeyboardEvent<HTMLInputElement>): void => {
     if (e.key === 'Enter') {
-      handleSearchLexicalCode(tempSearchCondition)
+      handleSearchLexicalCode(tempSearchParams)
     }
   }
 
   useEffect(() => {
     window.context.onUpdateLexicalCode((keyword: string) => {
-      setTempSearchCondition((prev) => {
+      setTempSearchParams((prev) => {
         const condition = {
           ...prev,
           codes: keyword ? [keyword] : prev.codes
@@ -65,19 +67,19 @@ export default function LexicalCodeSearch(): JSX.Element {
       while (newCodes.length < FIXED_INPUT_COUNT) {
         newCodes.push('')
       }
-      setTempSearchCondition({
-        ...tempSearchCondition,
+      setTempSearchParams({
+        ...tempSearchParams,
         codes: newCodes.slice(0, FIXED_INPUT_COUNT)
       })
     }
-  }, [codes, setTempSearchCondition])
+  }, [codes, setTempSearchParams])
 
   return (
     <>
       <div className="flex flex-col gap-8pxr">
         <div className="flex gap-8pxr">
           <CustomSelect
-            value={tempSearchCondition.version}
+            value={tempSearchParams.version}
             itemList={PANEL_CATEGORIES_AND_VERSIONS[PanelCategory.CODED_BIBLE].map(
               (version: string) => ({
                 key: version,
@@ -85,16 +87,16 @@ export default function LexicalCodeSearch(): JSX.Element {
                 text: version
               })
             )}
-            setValue={(value) => setTempSearchCondition({ ...tempSearchCondition, version: value })}
+            setValue={(value) => setTempSearchParams({ ...tempSearchParams, version: value })}
           />
           <BibleRangeSelector
             placeholder="검색 범위 선택"
             initialValue={{
-              start: tempSearchCondition.bookRange[0],
-              end: tempSearchCondition.bookRange[1]
+              start: tempSearchParams.bookRange[0],
+              end: tempSearchParams.bookRange[1]
             }}
             onSelect={(start, end) => {
-              setTempSearchCondition({ ...tempSearchCondition, bookRange: [start, end] })
+              setTempSearchParams({ ...tempSearchParams, bookRange: [start, end] })
             }}
           />
         </div>
@@ -105,7 +107,7 @@ export default function LexicalCodeSearch(): JSX.Element {
               key={index}
               ref={index === 0 ? firstInputRef : undefined}
               type="text"
-              value={tempSearchCondition.codes[index] || ''}
+              value={tempSearchParams.codes[index] || ''}
               onChange={(e) => handleCodeChange(index, e.target.value)}
               onKeyDown={handleEnterKey}
               id={`lexical-code-${index}`}
@@ -114,7 +116,7 @@ export default function LexicalCodeSearch(): JSX.Element {
           ))}
           <Button
             type="button"
-            onClick={() => handleSearchLexicalCode(tempSearchCondition)}
+            onClick={() => handleSearchLexicalCode(tempSearchParams)}
             size="icon"
           >
             <IconSearch size={18} />

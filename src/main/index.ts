@@ -20,7 +20,8 @@ import {
   TFindHymn,
   TFindLexicon,
   TFindCommentary,
-  TFindKeywordFromBible
+  TFindKeywordFromBible,
+  TFindKeywordFromHymn
 } from '@shared/types.js'
 import {
   findBible,
@@ -28,7 +29,7 @@ import {
   findLexicalCodeFromBible
 } from '@/repository/BibleRepository.js'
 import { findLexicon } from './repository/LexiconRepository.js'
-import { findHymn } from './repository/HymnRepository.js'
+import { findHymn, findKeywordFromHymn } from './repository/HymnRepository.js'
 import icon from '../../resources/icon.ico?asset'
 import { findCommentary } from './repository/CommentaryRepository.js'
 
@@ -50,6 +51,23 @@ protocol.registerSchemesAsPrivileged([
     }
   }
 ])
+
+export function handleVersionChange(): void {
+  const currentVersion = app.getVersion()
+  const lastVersion = store.get('lastVersion', '') as string
+
+  if (lastVersion !== currentVersion) {
+    console.log(`버전 변경 감지됨: ${lastVersion} → ${currentVersion}`)
+
+    const configPath = path.join(app.getPath('userData'), 'config.json')
+    if (fs.existsSync(configPath)) {
+      fs.unlinkSync(configPath)
+      console.log('이전 config.json 삭제됨')
+    }
+
+    store.set('lastVersion', currentVersion)
+  }
+}
 
 function createWindow(): void {
   // Create the browser window.
@@ -89,6 +107,8 @@ function createWindow(): void {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
+  handleVersionChange()
+
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
 
@@ -176,13 +196,16 @@ app.whenReady().then(() => {
     findCommentary(...args)
   )
   ipcMain.handle('findLexicon', (_, ...args: Parameters<TFindLexicon>) => findLexicon(...args))
+  ipcMain.handle('findHymn', (_, ...args: Parameters<TFindHymn>) => findHymn(...args))
   ipcMain.handle('findKeywordFromBible', (_, ...args: Parameters<TFindKeywordFromBible>) =>
     findKeywordFromBible(...args)
   )
   ipcMain.handle('findLexicalCodeFromBible', (_, ...args: Parameters<TFindLexicalCodeFromBible>) =>
     findLexicalCodeFromBible(...args)
   )
-  ipcMain.handle('findHymn', (_, ...args: Parameters<TFindHymn>) => findHymn(...args))
+  ipcMain.handle('findKeywordFromHymn', (_, ...args: Parameters<TFindKeywordFromHymn>) =>
+    findKeywordFromHymn(...args)
+  )
   ipcMain.handle('getAudioFilePath', (_, fileName) => {
     const filePath =
       process.env.NODE_ENV === 'development'

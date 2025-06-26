@@ -1,4 +1,4 @@
-import { bibleVerseSearchConditionAtom, bibleVerseSearchResultAtom } from '@renderer/store'
+import { bibleVerseSearchParamsAtom, bibleVerseSearchResultAtom } from '@renderer/store'
 import { useAtom, useSetAtom } from 'jotai'
 import { useEffect, useRef, useState } from 'react'
 import CustomSelect from '../common/CustomSelect'
@@ -13,22 +13,22 @@ const FIXED_INPUT_COUNT = 3
 export default function BibleVerseSearch(): JSX.Element {
   const firstInputRef = useRef<HTMLInputElement>(null)
 
-  const [searchCondition, setSearchCondition] = useAtom(bibleVerseSearchConditionAtom)
+  const [searchParams, setSearchParams] = useAtom(bibleVerseSearchParamsAtom)
   const setBibleVerseSearchResult = useSetAtom(bibleVerseSearchResultAtom)
-  const { keywords } = searchCondition
+  const { keywords } = searchParams
 
-  const [tempSearchCondition, setTempSearchCondition] = useState(searchCondition)
-  const { keywords: tempKeywords } = tempSearchCondition
+  const [tempSearchParams, setTempSearchParams] = useState(searchParams)
+  const { keywords: tempKeywords } = tempSearchParams
 
   const handleKeywordChange = (index: number, value: string): void => {
     const updatedKeywords = [...tempKeywords]
     updatedKeywords[index] = value
-    setTempSearchCondition({ ...tempSearchCondition, keywords: updatedKeywords })
+    setTempSearchParams({ ...tempSearchParams, keywords: updatedKeywords })
   }
 
   const handleSearchBibleVerse = async (): Promise<void> => {
-    setSearchCondition(tempSearchCondition)
-    const result = await window.context.findKeywordFromBible(tempSearchCondition)
+    setSearchParams(tempSearchParams)
+    const result = await window.context.findKeywordFromBible(tempSearchParams)
     if (result) {
       setBibleVerseSearchResult(result)
     }
@@ -55,34 +55,34 @@ export default function BibleVerseSearch(): JSX.Element {
       while (newKeywords.length < FIXED_INPUT_COUNT) {
         newKeywords.push('')
       }
-      setTempSearchCondition({
-        ...searchCondition,
+      setTempSearchParams({
+        ...searchParams,
         keywords: newKeywords.slice(0, FIXED_INPUT_COUNT)
       })
     }
-  }, [keywords, setTempSearchCondition])
+  }, [keywords, setTempSearchParams])
 
   return (
     <>
       <div className="flex flex-col gap-8pxr">
         <div className="flex gap-8pxr">
           <CustomSelect
-            value={tempSearchCondition.version}
+            value={tempSearchParams.version}
             itemList={PANEL_CATEGORIES_AND_VERSIONS[PanelCategory.BIBLE].map((version: string) => ({
               key: version,
               value: version,
               text: version
             }))}
-            setValue={(value) => setTempSearchCondition({ ...tempSearchCondition, version: value })}
+            setValue={(value) => setTempSearchParams({ ...tempSearchParams, version: value })}
           />
           <BibleRangeSelector
             placeholder="검색 범위 선택"
             initialValue={{
-              start: tempSearchCondition.bookRange[0],
-              end: tempSearchCondition.bookRange[1]
+              start: tempSearchParams.bookRange[0],
+              end: tempSearchParams.bookRange[1]
             }}
             onSelect={(start, end) => {
-              setTempSearchCondition({ ...tempSearchCondition, bookRange: [start, end] })
+              setTempSearchParams({ ...tempSearchParams, bookRange: [start, end] })
             }}
           />
         </div>

@@ -40,6 +40,11 @@ export type TPanelGrid = {
   settings: Record<string, TPanelSettings>
 }
 
+export type ColumnSelectorState = {
+  visible: boolean
+  selectedIndices: number[]
+}
+
 export type TFindBible = (version: string, book: number, chapter: number) => Promise<TBible[]>
 
 export type TFindCommentary = (
@@ -48,7 +53,7 @@ export type TFindCommentary = (
   chapter: number
 ) => Promise<TCommentary[]>
 
-export type BibleVerseSearchCondition = {
+export type FindKeywordFromBibleParams = {
   version: string
   bookRange: [number, number]
   keywords: string[]
@@ -56,13 +61,13 @@ export type BibleVerseSearchCondition = {
 }
 
 export type TFindKeywordFromBible = (
-  condition: BibleVerseSearchCondition & {
+  params: FindKeywordFromBibleParams & {
     page?: number
     pageSize?: number
   }
 ) => Promise<TPagedResult<TBible>>
 
-export type LexicalCodeSearchCondition = {
+export type FindLexicalCodeFromBibleParams = {
   version: string
   bookRange: [number, number]
   codes: string[]
@@ -70,7 +75,7 @@ export type LexicalCodeSearchCondition = {
 }
 
 export type TFindLexicalCodeFromBible = (
-  condition: LexicalCodeSearchCondition & {
+  params: FindLexicalCodeFromBibleParams & {
     page?: number
     pageSize?: number
   }
@@ -78,12 +83,21 @@ export type TFindLexicalCodeFromBible = (
 
 export type TFindLexicon = (version: string, code: string) => Promise<TLexicon[]>
 
-export type TFindHymnParams = {
-  hymn_number?: string
-  title?: string
-  lyrics?: string
+export type TFindHymn = (hymnNumber: string) => Promise<THymn[]>
+
+export type FindKeywordFromHymnParams = {
+  searchTarget: 'title' | 'lyrics'
+  keywords: string[]
+  matchType: 'all' | 'any'
 }
 
-export type TFindHymn = (params: TFindHymnParams) => Promise<THymn[]>
+export type TFindKeywordFromHymn = (
+  params: FindKeywordFromHymnParams & {
+    page?: number
+    pageSize?: number
+  }
+) => Promise<TPagedResult<THymn>>
 
-export type HymnDisplayMode = 'scoreMode' | 'lyricsMode'
+export type HymnPageViewMode = 'score' | 'search' | 'list'
+
+export type ScoreViewMode = 'imageMode' | 'textMode'

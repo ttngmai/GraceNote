@@ -1,4 +1,4 @@
-import { bibleVerseSearchConditionAtom, bibleVerseSearchResultAtom } from '@renderer/store'
+import { bibleVerseSearchParamsAtom, bibleVerseSearchResultAtom } from '@renderer/store'
 import { BOOK_INFO } from '@shared/constants'
 import { useAtomValue } from 'jotai'
 import { forwardRef, Key, useEffect, useRef, useState } from 'react'
@@ -14,13 +14,13 @@ export default function BibleVerseViewer(): JSX.Element {
   const keywordMatchedVersesScrollRef = useRef<VirtuosoHandle>(null)
   const fullChaptersWithKeywordScrollRef = useRef<HTMLDivElement>(null)
 
-  const searchCondition = useAtomValue(bibleVerseSearchConditionAtom)
-  const { version, bookRange, keywords } = searchCondition
+  const searchParams = useAtomValue(bibleVerseSearchParamsAtom)
+  const { version, bookRange, keywords } = searchParams
   const bibleVerseSearchResult = useAtomValue(bibleVerseSearchResultAtom)
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
-    queryKey: ['bibleVerses', searchCondition],
-    queryFn: ({ pageParam = 1 }) => fetchBibleVerses({ pageParam, ...searchCondition }),
+    queryKey: ['bibleVerses', searchParams],
+    queryFn: ({ pageParam = 1 }) => fetchBibleVerses({ pageParam, ...searchParams }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) =>
       lastPage.currentPage < lastPage.totalPages ? lastPage.currentPage + 1 : undefined
@@ -69,8 +69,8 @@ export default function BibleVerseViewer(): JSX.Element {
 
   return (
     <div className="flex w-full">
-      <div className="flex-1 overflow-hidden bg-indigo-100">
-        {searchCondition && (
+      <div className="flex-1 overflow-hidden bg-[#9FC9B7]">
+        {searchParams && (
           <div className="flex flex-col p-16pxr">
             <div>
               ◆ {BOOK_INFO.find((el) => el.id === bookRange[0])?.shortName || ''}
@@ -109,7 +109,7 @@ export default function BibleVerseViewer(): JSX.Element {
       </div>
       <div
         ref={fullChaptersWithKeywordScrollRef}
-        className="flex-1 p-16pxr overflow-y-auto bg-rose-100"
+        className="flex-1 p-16pxr overflow-y-auto bg-[#C6BF8F]"
       >
         {bibleData
           ? bibleData.map(({ book, chapter, verse, btext }) => (
@@ -133,8 +133,8 @@ export default function BibleVerseViewer(): JSX.Element {
 }
 
 const getHighlightColor = (index: number, isLight: boolean): TwStyle => {
-  const lightColors = [tw`text-red-500`, tw`text-green-500`, tw`text-purple-500`]
-  const darkColors = [tw`text-red-300`, tw`text-green-300`, tw`text-purple-300`]
+  const lightColors = [tw`text-red-500`, tw`text-orange-500`, tw`text-purple-500`]
+  const darkColors = [tw`text-red-300`, tw`text-orange-300`, tw`text-purple-300`]
   return isLight ? lightColors[index] : darkColors[index]
 }
 
@@ -294,7 +294,7 @@ const FullChaptersWithKeywordItem = ({
       css={[
         tw`mb-[0.25rem]`,
         verse === 1 ? tw`pt-[0.25rem]` : '',
-        isHighlighted ? tw`p-4pxr border-2 rounded-lg border-rose-500 bg-white` : ``
+        isHighlighted ? tw`p-4pxr border-2 rounded-lg bg-stone-200 shadow` : ``
       ]}
     >
       <div className="flex">

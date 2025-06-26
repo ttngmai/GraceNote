@@ -108,19 +108,19 @@ export default function BibleSelector(): JSX.Element {
         <Popover.Portal>
           <Popover.Content
             sideOffset={5}
-            className="flex max-h-384pxr border border-gray-300 bg-white rounded-md shadow-sm overflow-hidden"
+            className="flex max-h-560pxr border border-gray-300 bg-white rounded-md shadow-sm overflow-hidden"
             style={{
               height: 'calc(var(--radix-popover-content-available-height) - 16px)'
             }}
           >
-            <div className="flex flex-col w-360pxr">
-              <div className="flex items-center h-32pxr py-4pxr border-b border-b-gray-300 font-bold text-[14px]">
-                <div className="flex items-center w-120pxr h-full">
+            <div className="flex flex-col">
+              <div className="flex items-center h-28pxr py-4pxr border-b border-b-gray-300 font-bold text-[14px]">
+                <div className="flex items-center gap-2pxr w-110pxr h-full px-2pxr">
                   <Button
                     type="button"
                     onClick={() => scrollToBook(1)}
                     variant="ghost"
-                    sx={tw`flex-1 h-full`}
+                    sx={tw`flex-1 h-full bg-green-100 hover:bg-green-200`}
                   >
                     구약
                   </Button>
@@ -128,16 +128,16 @@ export default function BibleSelector(): JSX.Element {
                     type="button"
                     onClick={() => scrollToBook(40)}
                     variant="ghost"
-                    sx={tw`flex-1 h-full`}
+                    sx={tw`flex-1 h-full bg-red-100 hover:bg-red-200`}
                   >
                     신약
                   </Button>
                 </div>
-                <div className="w-120pxr h-full border-x text-center">장</div>
-                <div className="w-120pxr h-full text-center">절</div>
+                <div className="w-68pxr h-full border-x text-center">장</div>
+                <div className="w-68pxr h-full text-center">절</div>
               </div>
-              <div className="flex h-[calc(100%-32px)]">
-                <ul ref={bookListRef} className="w-120pxr overflow-y-auto scroll-hidden">
+              <div className="flex h-[calc(100%-28px)]">
+                <ul ref={bookListRef} className="w-110pxr overflow-y-auto">
                   {BOOK_INFO.map((el) => (
                     <li
                       key={el.id}
@@ -146,20 +146,18 @@ export default function BibleSelector(): JSX.Element {
                         setSelectedBible({ book: el.id, chapter: null, verse: null })
                       }}
                       css={[
-                        tw`flex items-center gap-4pxr h-32pxr px-8pxr py-4pxr text-[14px] select-none cursor-pointer hover:font-bold`,
-                        el.id === selectedBible.book
-                          ? tw`bg-brand-blue-50 font-bold`
-                          : tw`hover:bg-[#F8FAFC]`
+                        tw`flex items-center gap-4pxr h-28pxr px-8pxr py-4pxr text-[14px] select-none cursor-pointer hover:font-bold`,
+                        el.id <= 39
+                          ? tw`bg-green-100 hover:bg-green-200`
+                          : tw`bg-red-100 hover:bg-red-200`,
+                        el.id === selectedBible.book && tw`font-bold text-brand-blue-500`
                       ]}
                     >
                       <span>{el.name}</span>
                     </li>
                   ))}
                 </ul>
-                <ul
-                  ref={chapterListRef}
-                  className="w-120pxr overflow-y-auto scroll-hidden border-x"
-                >
+                <ul ref={chapterListRef} className="w-68pxr overflow-y-auto border-x">
                   {BIBLE_COUNT_INFO.filter((el) => el.book === selectedBible.book).map((el) => (
                     <li
                       key={el.chapter}
@@ -168,17 +166,18 @@ export default function BibleSelector(): JSX.Element {
                         setSelectedBible({ ...selectedBible, chapter: el.chapter, verse: null })
                       }}
                       css={[
-                        tw`flex items-center gap-4pxr h-32pxr px-8pxr py-4pxr text-[14px] select-none cursor-pointer hover:font-bold`,
-                        el.chapter === selectedBible.chapter
-                          ? tw`bg-brand-blue-50 font-bold`
-                          : tw`hover:bg-[#F8FAFC]`
+                        tw`flex items-center gap-4pxr h-28pxr px-8pxr py-4pxr text-[14px] select-none cursor-pointer hover:font-bold`,
+                        selectedBible.book && selectedBible.book <= 39
+                          ? tw`bg-green-100 hover:bg-green-200`
+                          : tw`bg-red-100 hover:bg-red-200`,
+                        el.chapter === selectedBible.chapter && tw`font-bold text-brand-blue-500`
                       ]}
                     >
                       {`${el.chapter}${el.book !== 19 ? '장' : '편'}`}
                     </li>
                   ))}
                 </ul>
-                <ul ref={verseListRef} className="w-120pxr overflow-y-auto scroll-hidden">
+                <ul ref={verseListRef} className="w-68pxr overflow-y-auto">
                   {Array.from({ length: lastVerse }).map((_, index) => (
                     <li
                       key={index + 1}
@@ -191,10 +190,11 @@ export default function BibleSelector(): JSX.Element {
                         }
                       }}
                       css={[
-                        tw`flex items-center gap-4pxr h-32pxr px-8pxr py-4pxr text-[14px] select-none cursor-pointer hover:font-bold`,
-                        index + 1 === selectedBible.verse
-                          ? tw`bg-brand-blue-50 font-bold`
-                          : tw`hover:bg-[#F8FAFC]`
+                        tw`flex items-center gap-4pxr h-28pxr px-8pxr py-4pxr text-[14px] select-none cursor-pointer hover:font-bold`,
+                        selectedBible.book && selectedBible.book <= 39
+                          ? tw`bg-green-100 hover:bg-green-200`
+                          : tw`bg-red-100 hover:bg-red-200`,
+                        index + 1 === selectedBible.verse && tw`font-bold text-brand-blue-500`
                       ]}
                     >
                       {`${index + 1}절`}

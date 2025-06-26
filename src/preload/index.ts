@@ -5,7 +5,8 @@ import {
   TFindHymn,
   TFindLexicon,
   TFindCommentary,
-  TFindKeywordFromBible
+  TFindKeywordFromBible,
+  TFindKeywordFromHymn
 } from '@shared/types.js'
 
 if (!process.contextIsolated) {
@@ -46,6 +47,8 @@ try {
       ipcRenderer.invoke('findKeywordFromBible', ...args),
     findLexicalCodeFromBible: (...args: Parameters<TFindLexicalCodeFromBible>) =>
       ipcRenderer.invoke('findLexicalCodeFromBible', ...args),
+    findKeywordFromHymn: (...args: Parameters<TFindKeywordFromHymn>) =>
+      ipcRenderer.invoke('findKeywordFromHymn', ...args),
     getAudioFilePath: (fileName: string) => ipcRenderer.invoke('getAudioFilePath', fileName),
     getImageFilePath: (fileName: string) => ipcRenderer.invoke('getImageFilePath', fileName),
     openBibleVerseWindow: () => ipcRenderer.invoke('open-bible-verse-window'),

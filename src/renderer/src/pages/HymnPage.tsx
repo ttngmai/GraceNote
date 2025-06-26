@@ -6,7 +6,7 @@ export default function HymnPage(): JSX.Element {
     <>
       <HymnPageNavigation />
 
-      <div className="h-[calc(100vh-60px)] m-16pxr">
+      <div className="flex h-[calc(100vh-110px)]">
         <HymnViewer />
       </div>
     </>

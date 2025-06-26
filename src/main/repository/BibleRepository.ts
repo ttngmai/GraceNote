@@ -28,12 +28,7 @@ export const findKeywordFromBible: TFindKeywordFromBible = async ({
     const db = getBibleDB(version)
 
     if (!keywords || keywords.length === 0) {
-      return {
-        data: [],
-        totalCount: 0,
-        currentPage: page,
-        totalPages: 0
-      }
+      throw new Error('Invalid keywords')
     }
 
     const conditions = keywords
@@ -98,12 +93,7 @@ export const findLexicalCodeFromBible: TFindLexicalCodeFromBible = async ({
     const db = getBibleDB(version)
 
     if (!codes || codes.length === 0) {
-      return {
-        data: [],
-        totalCount: 0,
-        currentPage: page,
-        totalPages: 0
-      }
+      throw new Error('Invalid codes')
     }
 
     const conditions = codes

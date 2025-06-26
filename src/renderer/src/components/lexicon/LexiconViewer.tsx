@@ -1,4 +1,4 @@
-import { lexicalCodeSearchConditionAtom, lexicalCodeSearchResultAtom } from '@renderer/store'
+import { lexicalCodeSearchParamsAtom, lexicalCodeSearchResultAtom } from '@renderer/store'
 import { BOOK_INFO } from '@shared/constants'
 import { useAtomValue } from 'jotai'
 import tw, { TwStyle } from 'twin.macro'
@@ -14,13 +14,13 @@ export default function LexiconViewer(): JSX.Element {
   const keywordMatchedVersesScrollRef = useRef<VirtuosoHandle>(null)
   const fullChaptersWithKeywordScrollRef = useRef<HTMLDivElement>(null)
 
-  const searchCondition = useAtomValue(lexicalCodeSearchConditionAtom)
-  const { version, bookRange, codes } = searchCondition
+  const searchParams = useAtomValue(lexicalCodeSearchParamsAtom)
+  const { version, bookRange, codes } = searchParams
   const lexicalCodeSearchResult = useAtomValue(lexicalCodeSearchResultAtom)
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
-    queryKey: ['lexicons', searchCondition],
-    queryFn: ({ pageParam = 1 }) => fetchLexicons({ pageParam, ...searchCondition }),
+    queryKey: ['lexicons', searchParams],
+    queryFn: ({ pageParam = 1 }) => fetchLexicons({ pageParam, ...searchParams }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) =>
       lastPage.currentPage < lastPage.totalPages ? lastPage.currentPage + 1 : undefined
@@ -71,8 +71,8 @@ export default function LexiconViewer(): JSX.Element {
 
   return (
     <div className="flex w-full">
-      <div className="flex-1 overflow-hidden bg-emerald-100">
-        {searchCondition && (
+      <div className="flex-1 overflow-hidden bg-[#ABC3E2]">
+        {searchParams && (
           <div className="flex flex-col p-16pxr">
             <div>
               ◆ {BOOK_INFO.find((el) => el.id === bookRange[0])?.shortName || ''}
@@ -111,7 +111,7 @@ export default function LexiconViewer(): JSX.Element {
       </div>
       <div
         ref={fullChaptersWithKeywordScrollRef}
-        className="flex-1 p-16pxr overflow-y-auto bg-amber-100"
+        className="flex-1 p-16pxr overflow-y-auto bg-[#CEBEF6]"
       >
         {bibleData
           ? bibleData.map(({ book, chapter, verse, btext }) => (
@@ -136,8 +136,8 @@ export default function LexiconViewer(): JSX.Element {
 }
 
 const getHighlightColor = (index: number, isLight: boolean): TwStyle => {
-  const lightColors = [tw`text-red-500`, tw`text-green-500`, tw`text-purple-500`]
-  const darkColors = [tw`text-red-300`, tw`text-green-300`, tw`text-purple-300`]
+  const lightColors = [tw`text-red-500`, tw`text-orange-500`, tw`text-purple-500`]
+  const darkColors = [tw`text-red-300`, tw`text-orange-300`, tw`text-purple-300`]
   return isLight ? lightColors[index] : darkColors[index]
 }
 
@@ -362,7 +362,7 @@ const FullChaptersWithKeywordItem = ({
       css={[
         tw`mb-[0.25rem]`,
         verse === 1 ? tw`pt-[0.25rem]` : '',
-        isHighlighted ? tw`p-4pxr border-2 rounded-lg border-rose-500 bg-white` : ``
+        isHighlighted ? tw`p-4pxr border-2 rounded-lg bg-stone-200 shadow` : ``
       ]}
     >
       <div className="flex">
